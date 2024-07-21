@@ -1,0 +1,7 @@
+# ninja log v6
+2	356	7432701773779344	build.ninja	7ca6f1f6b2a4e2bd
+3	234	7432701347102737	CMakeFiles/Assembler.dir/main.c.obj	653f81376ad72f4c
+249	411	7432701349562763	Assembler.exe	fae0bb0b9b7ced44
+27	249	7432701347347601	CMakeFiles/Assembler.dir/MacroProcessing.c.obj	738425d8c5c8ee09
+3	262	7432707623421403	CMakeFiles/Assembler.dir/main.c.obj	653f81376ad72f4c
+262	398	7432707626011565	Assembler.exe	fae0bb0b9b7ced44
