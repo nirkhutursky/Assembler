@@ -7,7 +7,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-/*#include "Constants.h"  /* Include the general constants header */
+#include "AssemblyConstants.h"  /*Include the general constants header */
 
 /* Function declarations */
 void parse_macros(const char *input_file, const char *output_file);
