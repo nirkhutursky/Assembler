@@ -21,6 +21,8 @@
 #define LINE_SIZE 81
 /*The maximal possible label size */
 #define LABEL_SIZE 31
+/*The maximum number of macros allowed in one file */
+#define MAX_NUM_OF_MACROS 137
 
 
 /* The registers in our custom assembly language */

@@ -9,5 +9,6 @@ set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -std=c90 -Wall -ansi -ped
 add_executable(Assembler main.c
         MacroProcessing.c
         MacroProcessing.h
-        AssemblyConstants.h)
+        AssemblyConstants.h
+        structs.h)
 target_compile_options(Assembler PRIVATE -std=c90 -Wall -ansi -pedantic)

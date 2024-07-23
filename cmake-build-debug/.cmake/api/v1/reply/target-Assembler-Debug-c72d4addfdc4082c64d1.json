@@ -34,7 +34,7 @@
 			{
 				"command" : 1,
 				"file" : 0,
-				"line" : 13,
+				"line" : 14,
 				"parent" : 0
 			}
 		]
@@ -122,7 +122,8 @@
 			"sourceIndexes" : 
 			[
 				2,
-				3
+				3,
+				4
 			]
 		}
 	],
@@ -148,6 +149,11 @@
 		{
 			"backtrace" : 1,
 			"path" : "AssemblyConstants.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 1,
+			"path" : "structs.h",
 			"sourceGroupIndex" : 1
 		}
 	],
