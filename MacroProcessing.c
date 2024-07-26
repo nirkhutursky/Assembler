@@ -256,6 +256,13 @@ int parse_macros(const char *input_file, const char *output_file) {
             }
             in_macro = 1;
         } else if (strncmp(line, "endmacr", 7) == 0 && in_macro) {
+            if (strlen(line) > 7) {
+                fprintf(stderr, "Extra characters after endmacr: %s (line %d)\n", line, line_number);
+                fclose(in);
+                fclose(out);
+                remove(output_file);
+                return 0;
+            }
             in_macro = 0;
         } else if (in_macro) {
             store_macro_definition(macro_table, macro_name, line, line_number);
