@@ -23,7 +23,10 @@
 #define LABEL_SIZE 31
 /*The maximum number of macros allowed in one file */
 #define MAX_NUM_OF_MACROS 137
-
+/*the length of the start of macro definition, starting with "macr "*/
+#define MACRODEF 5
+/*the length of the end of macro definition, starting with "endmacr"*/
+#define MACEND 7
 
 /* The registers in our custom assembly language */
 static const char *registers[] = {

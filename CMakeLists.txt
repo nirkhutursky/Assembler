@@ -10,5 +10,7 @@ add_executable(Assembler main.c
         MacroProcessing.c
         MacroProcessing.h
         AssemblyConstants.h
-        structs.h)
+        structs.h
+        helper.h
+        helper.c)
 target_compile_options(Assembler PRIVATE -std=c90 -Wall -ansi -pedantic)
