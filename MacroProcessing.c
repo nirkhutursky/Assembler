@@ -28,7 +28,7 @@ int validate_macro(const char *name, MacroTable *macro_table) {
     if (find_macro(macro_table, name) != NULL) return 0;
 
     for (i = 0; name[i] != '\0'; i++) {
-        if (!isalnum(name[i])) return 0; /* Check if the name contains only alphanumeric characters */
+        if (!isalnum(name[i]) && name[i]!='_') return 0; /* Check if the name contains only alphanumeric characters */
     }
     return 1; /* Valid name */
 }
@@ -227,47 +227,50 @@ void putLine(char *line, FILE *out) {
 
 /*This function is the main function, it parses the macros line by line
  * categorizing each line (either a macro definition, macro end, inside a macro or outside a macro*/
-int parse_macros(const char *input_file, const char *output_file) {
+int parse_macros(const char *input_file, const char *output_file, MacroTable *macro_table) {
     FILE *in;
     FILE *out;
-    MacroTable *macro_table;
     int in_macro;
     int line_number;
     char line[LINE_SIZE];
     char macro_name[LINE_SIZE];
-    int i;
-    /*Open the input and output files*/
+    char* beg;
+
+    /* Open the input and output files */
     in = fopen(input_file, "r");
     out = fopen(output_file, "w");
     if (!in || !out) {
         fprintf(stderr, "Error opening file.\n");
         if (in) fclose(in);
         if (out) fclose(out);
-        /*Delete the file if there was a problem*/
+        /* Delete the file if there was a problem */
         remove(output_file);
         return 0;
     }
-    /*Create an empty macro table*/
-    macro_table = create_macro_table();
-    /*In macro is a flag that tells us if we are inside a macro right now */
+
+    /* Create an empty macro table */
+    /* In macro is a flag that tells us if we are inside a macro right now */
     in_macro = 0;
     line_number = 0;
-    /*reading the file lines one by one, and processing them each to the correct category*/
+    /* Reading the file lines one by one, and processing them each to the correct category */
     while (read_line(in, line, sizeof(line), &line_number)) {
-        /*Macro definition case*/
-        if (strncmp(line, "macr ", MACRODEF) == 0 && !in_macro) {
-            if (!process_macro(macro_table, line, macro_name, line_number)) {
+
+        /* Macro definition case, we ignore spaces at the beginning */
+        beg = line;
+        while(*beg == ' ') beg++;
+        if (strncmp(beg, "macr ", MACRODEF) == 0 && !in_macro) {
+            if (!process_macro(macro_table, beg, macro_name, line_number)) {
                 fclose(in);
                 fclose(out);
                 remove(output_file);
                 return 0;
             }
             in_macro = 1;
-        } else if (strncmp(line, "endmacr", MACEND) == 0 && in_macro) {
-            /*Macro ending case*/
+        } else if (strncmp(beg, "endmacr", MACEND) == 0 && in_macro) {
+            /* Macro ending case */
             if (strlen(line) > MACEND) {
-                /*We have chars after the endmacr, resulting in error, so we delete the file in this case*/
-                fprintf(stderr, "Extra characters after endmacr: %s (line %d)\n", line, line_number);
+                /* We have chars after the endmacr, resulting in error, so we delete the file in this case */
+                fprintf(stderr, "Extra characters after endmacr: %s (line %d)\n", beg, line_number);
                 fclose(in);
                 fclose(out);
                 remove(output_file);
@@ -275,31 +278,36 @@ int parse_macros(const char *input_file, const char *output_file) {
             }
             in_macro = 0;
         } else if (in_macro) {
-            /*We are inside a macro case, then we save the data to current macro we are inside of*/
-            macro_data(macro_table, macro_name, line, line_number);
+            /* We are inside a macro case, then we save the data to current macro we are inside of */
+            macro_data(macro_table, macro_name, beg, line_number);
         } else {
-            /*Outside of a macro case, then we need to add the line to the output file
+            /* Outside of a macro case, then we need to add the line to the output file
              * or expand the macro if it's a macro name
              */
-            expand_macros(macro_table, line, out);
+            expand_macros(macro_table, beg, out);
         }
     }
 
     fclose(in);
     fclose(out);
 
-    /* Free all macros in the macro table and its content after we parsed them to the file */
+    return 1;
+}
+
+/*This functin frees the macro table given as input*/
+void free_macro_table(MacroTable *macro_table) {
+    int i;
     for (i = 0; i < macro_table->size; i++) {
-        MacroNode *node;
-        node = macro_table->table[i];
-        if (node) {
+        MacroNode *node = macro_table->table[i];
+        while (node) {
+            MacroNode *next = node->next;
             free_macro(node->macro);
             free(node->name);
             free(node);
+            node = next;
         }
     }
-
     free(macro_table->table);
     free(macro_table);
-    return 1;
 }
+

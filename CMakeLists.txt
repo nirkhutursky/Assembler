@@ -12,5 +12,7 @@ add_executable(Assembler main.c
         AssemblyConstants.h
         structs.h
         helper.h
-        helper.c)
+        helper.c
+        passOne.c
+        passOne.h)
 target_compile_options(Assembler PRIVATE -std=c90 -Wall -ansi -pedantic)

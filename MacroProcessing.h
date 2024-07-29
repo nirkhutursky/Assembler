@@ -95,7 +95,11 @@ void putLine(char *line, FILE *out);
  * It gets the input file from which it reads lines and processing them,
  * and it gets the output file to which we write the expanded macros. This will the processed file
  */
-int parse_macros(const char *input_file, const char *output_file);
+int parse_macros(const char *input_file, const char *output_file, MacroTable *macro_table);
+
+
+/*This functin frees the macro table given as input*/
+void free_macro_table(MacroTable *macro_table);
 
 #endif /* MACROPROCESSING_H*/
 
