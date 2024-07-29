@@ -7,10 +7,10 @@ macr1
 add r3, r4
 label1: .data 5, 10, -3
 mov label1, r1
-macr macrs
+macr haviv
 bne r23
 endmacr
 jmp label1
-macrs
+haviv
 macr1
-macrs
+haviv

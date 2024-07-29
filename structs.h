@@ -1,15 +1,28 @@
-
-
 #ifndef STRUCTS_H
 #define STRUCTS_H
 
-/* Data Structures that are used in all stages of the processing*/
 
-/* A struct that represents a line in the assembly code */
 typedef struct Line {
     char *value;
     int number;
-    struct Line *next; /* Pointer to the next line in the linked list */
+    struct Line *next;
 } Line;
 
-#endif /*STRUCTS_H*/
+typedef struct Macro {
+    char *name;
+    Line *lines;  /* Pointer to the head of the linked list of lines */
+    struct Macro *next;
+} Macro;
+
+typedef struct MacroNode {
+    char *name;
+    Macro *macro;
+    struct MacroNode *next;
+} MacroNode;
+
+typedef struct MacroTable {
+    MacroNode **table;  /* Pointer to an array of pointers to MacroNode */
+    int size;
+} MacroTable;
+
+#endif /* STRUCTS_H */
