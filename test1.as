@@ -1,5 +1,5 @@
 MAIN: add r3, LIST
-LOOP: prn #48
+LOOP : prn #48
 lea STR, r6
 inc r6
 mov *r6,K
@@ -9,4 +9,4 @@ bne END
 dec K
 jmp LOOP
 END: stop
-STR: .string “abcd”
+STR:    .string    "abcd"

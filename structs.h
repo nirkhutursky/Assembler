@@ -25,4 +25,18 @@ typedef struct MacroTable {
     int size;
 } MacroTable;
 
+
+
+typedef struct Label {
+    char *name;
+    int address;
+    int type;
+    struct Label *next;
+} Label;
+
+typedef struct LabelTable {
+    Label *head;
+    Label *tail;
+} LabelTable;
+
 #endif /* STRUCTS_H */

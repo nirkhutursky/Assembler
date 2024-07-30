@@ -10,6 +10,10 @@
  */
 void get_out_name(const char *input_filename, char *output_filename);
 
+int is_label(const char *line, char **label) ;
+
+int is_instruction(const char *line);
+
 
 
 #endif /*HELPER_H*/

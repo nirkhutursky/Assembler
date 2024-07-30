@@ -1,13 +1,14 @@
 #include <stdio.h>
 
 /*COMPILE
-  gcc -o ass MacroProcessing.c helper.c main.c -std=c90 -Wall -Wextra -pedantic
+  gcc -o ass MacroProcessing.c helper.c passOne.c main.c -std=c90 -Wall -Wextra -pedantic
   ./ass.exe testMacro test1
  */
 #include <stdlib.h>
 
 #include "MacroProcessing.h"
 #include "helper.h"
+#include "passOne.h"
 /*This project uses ansiC90*/
 
 
@@ -32,7 +33,7 @@ int main(int argc, char *argv[]) {
             fprintf(stderr, "Error processing file: %s\n", argv[i]);
             remove(output_filename);
         }
-
+        print_labels_content(output_filename);
         free_macro_table(mt);
         mt = create_macro_table();
     }

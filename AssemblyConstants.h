@@ -27,6 +27,11 @@
 #define MACRODEF 5
 /*the length of the end of macro definition, starting with "endmacr"*/
 #define MACEND 7
+/* Constants for all possible label types */
+#define DATA 1
+#define STRING 2
+#define ENTRY 3
+#define EXTERN 4
 
 /* The registers in our custom assembly language */
 static const char *registers[] = {
