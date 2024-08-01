@@ -232,8 +232,8 @@ int parse_macros(const char *input_file, const char *output_file, MacroTable *ma
     FILE *out;
     int in_macro;
     int line_number;
-    char line[LINE_SIZE];
-    char macro_name[LINE_SIZE];
+    char line[BIG_LEN];
+    char macro_name[BIG_LEN];
     char* beg;
 
     /* Open the input and output files */

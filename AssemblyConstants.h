@@ -18,7 +18,7 @@
 /*Number of instructions*/
 #define NUM_OF_INSTRUCTIONS 4
 /*The maximal possible line size, including the '\n' character */
-#define LINE_SIZE 81
+#define LINE_SIZE 94
 /*The maximal possible label size */
 #define LABEL_SIZE 31
 /*The maximum number of macros allowed in one file */
@@ -27,6 +27,7 @@
 #define MACRODEF 5
 /*the length of the end of macro definition, starting with "endmacr"*/
 #define MACEND 7
+#define BIG_LEN 1234
 /* Constants for all possible label types */
 #define DATA 1
 #define STRING 2

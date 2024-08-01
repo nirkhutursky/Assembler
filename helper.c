@@ -2,6 +2,7 @@
 #include "helper.h"
 
 #include <ctype.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -9,9 +10,10 @@
 
 
 /* This functions adds .as ending to a given filer */
-void get_out_name(const char *input_filename, char *output_filename) {
+void get_out_name( char *input_filename, char *output_filename) {
     strcpy(output_filename, input_filename);
-    strcat(output_filename, ".as");
+    strcat(input_filename, ".as");
+    strcat(output_filename, ".am");
 }
 
 int is_label(const char *line, char **label) {
@@ -67,7 +69,7 @@ int is_instruction(const char *line) {
         result = 1;
         } else if (is_label(line, &label)) {
             /* Move past the label to the rest of the line */
-            start = line + strlen(label)+1;
+            start = (char *)(line + strlen(label) + 1);
             while (*start == ' ' || *start == '\t') start++;  /* Skip spaces after the label */
 
             /* Check if the remaining part of the line starts with any of the instruction types */
@@ -79,7 +81,10 @@ int is_instruction(const char *line) {
                 }
         }
 
-    free(line);
     if (label) free(label);
     return result;
+}
+
+void prer(int lineNum, char* error_type) {
+    printf("Error: %s! The error is on line %d\n", error_type, lineNum);
 }
