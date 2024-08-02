@@ -14,8 +14,8 @@ int print_labels_content(const char *filename);
 char* trim_label(const char *line, char **label);
 char* trim_instruction(const char *line, char **instruction);
 char* get_line_remainder(char *line, char **label, char **instruction);
-
-
+int validate_line(char *line, char *label, char *instruction, char *remainder);
+void trim_trailing_spaces(char *str);
 
 
 #endif /*PASSONE_H*/

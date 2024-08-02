@@ -15,6 +15,10 @@
 
 
 
+int validate_line(char *line, char *label, char *instruction, char *remainder) {
+    return 1;
+}
+
 int print_labels_content(const char *filename) {
     FILE *file;
     char line[2345];
@@ -22,7 +26,6 @@ int print_labels_content(const char *filename) {
     char *label = NULL;
     char *instruction = NULL;
     int lineNum = 0;
-    int len;
     file = fopen(filename, "r");
     if (file == NULL) {
         fprintf(stderr, "Error opening file: %s\n", filename);
@@ -31,17 +34,17 @@ int print_labels_content(const char *filename) {
 
     while (fgets(line, sizeof(line), file) != NULL) {
         lineNum++;
-
         /* Check if the line is truncated */
-        len = strlen(line);
         if (strlen(line)>LINE_SIZE) {
-            prer(lineNum, "Line too long");
+            prer(lineNum, "Line is too long");
             continue;
         }
+        /*Skip the line if it's a comment or an empty line; we already deleted all the trailing spaces*/
+        if (line[0]==';' || line[0]=='\n') continue;
 
         /* Process the line */
         remainder = get_line_remainder(line, &label, &instruction);
-        printf("Line - Label: %s, Instruction: %s, Remainder: %s", label , instruction , remainder);
+        validate_line(line,label,instruction,remainder);
         free(remainder);
         free(label);
         free(instruction);
@@ -56,6 +59,7 @@ char* trim_label(const char *line, char **label) {
     const char *colon_pos;
     int label_length;
     char *remaining_line;
+    int i, j;
 
     colon_pos = strchr(line, ':');
 
@@ -68,21 +72,23 @@ char* trim_label(const char *line, char **label) {
         return remaining_line; /* No colon found, return a copy of the whole line */
     }
 
-    /* Trim spaces before the colon */
-    while (colon_pos > line && isspace(*(colon_pos - 1))) {
-        colon_pos--;
-    }
-
     /* Calculate length of the potential label */
     label_length = colon_pos - line;
 
-    /* Allocate memory and copy the label */
+    /* Allocate memory for the label, maximum possible length is label_length */
     *label = (char *)malloc(label_length + 1);
     if (*label == NULL) {
         return NULL; /* Memory allocation failed */
     }
-    strncpy(*label, line, label_length);
-    (*label)[label_length] = '\0';
+
+    /* Copy the label without spaces */
+    j = 0;
+    for (i = 0; i < label_length; i++) {
+        if (!isspace(line[i])) {
+            (*label)[j++] = line[i];
+        }
+    }
+    (*label)[j] = '\0';  /* Null-terminate the label */
 
     /* Allocate memory and copy the remaining part of the line */
     remaining_line = (char *)malloc(strlen(colon_pos + 1) + 1); /* Skip the colon */
@@ -91,7 +97,6 @@ char* trim_label(const char *line, char **label) {
     }
     return remaining_line;
 }
-
 /*
  * Function: trim_instruction
  * --------------------------
@@ -111,7 +116,7 @@ char* trim_instruction(const char *line, char **instruction) {
     int instruction_length;
 
     /* Skip leading spaces */
-    while (*start == ' ' || *start == '\t') start++;
+    while (*start == ' ' || *start == '\t' ) start++;
 
     /* Find the end of the instruction */
     end = start;
@@ -142,6 +147,14 @@ char* trim_instruction(const char *line, char **instruction) {
 }
 
 /* Function to get the remainder of the line after label and instruction */
+void trim_trailing_spaces(char *str) {
+    char *end = str + strlen(str) - 1;
+    while (end > str && isspace((unsigned char)*end)) {
+        end--;
+    }
+    *(end + 1) = '\0';
+}
+
 char* get_line_remainder(char *line, char **label, char **instruction) {
     char *remainder = NULL;
 
@@ -152,6 +165,9 @@ char* get_line_remainder(char *line, char **label, char **instruction) {
     /* Trim the instruction */
     remainder = trim_instruction(line_after_label, instruction);
     free(line_after_label);
+
+    /* Trim trailing spaces from the remainder */
+    trim_trailing_spaces(remainder);
 
     return remainder;
 }

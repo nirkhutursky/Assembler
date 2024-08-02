@@ -86,5 +86,5 @@ int is_instruction(const char *line) {
 }
 
 void prer(int lineNum, char* error_type) {
-    printf("Error: %s! The error is on line %d\n", error_type, lineNum);
+    printf("Error on line %d: %s\n", lineNum, error_type);
 }
