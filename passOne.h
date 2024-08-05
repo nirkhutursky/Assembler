@@ -14,10 +14,11 @@ int print_labels_content(const char *filename, MacroTable *macro_table);
 char* trim_label(const char *line, char **label);
 char* trim_instruction(const char *line, char **instruction);
 char* get_line_remainder(char *line, char **label, char **instruction);
-int validate_line(char *line, char *label, char *instruction, char *remainder);
+int validate_line(char *line, char *label, char *instruction, char *remainder, int lineNum,MacroTable *macro_table);
 void trim_trailing_spaces(char *str);
 int valid_label(char *label, MacroTable *macro_table);
 int valid_instruction(char *instruction);
+int get_instruction(char *instruction);
 
 
 #endif /*PASSONE_H*/

@@ -11,6 +11,7 @@ macr haviv
 bne r23
 endmacr
 jmp label1
+ss: .data -3,+5353, -33, +15, 5
 haviv
 macr1
 haviv

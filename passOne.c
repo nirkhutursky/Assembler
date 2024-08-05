@@ -13,62 +13,20 @@
 
 
 
-
-
-int validate_line(char *line, char *label, char *instruction, char *remainder) {
-    return 1;
-}
-
-int valid_label(char *label, MacroTable *macro_table) {
-    int i;
-    /* Check that it's not an operation name */
-    for (i = 0; i < (int)(sizeof(operations) / sizeof(operations[0])); ++i) {
-        if (strcmp(label, operations[i]) == 0) {
-            return 0; /* Invalid name */
-        }
-    }
-
-    /* Check that it's not an instruction names */
-    for (i = 0; i < (int)(sizeof(instructions) / sizeof(instructions[0])); ++i) {
-        if (strcmp(label, instructions[i]) == 0) {
-            return 0; /* Invalid name */
-        }
-    }
-
-    /*Check that it's not an a macro name*/
-    if (find_macro(macro_table, label) != NULL) return 0;
-    /*Label is too long*/
-    if (strlen(label)>LABEL_SIZE) return 0;
-    /*The label is not according to the needed format*/
-    if (!isalpha(label[0])) return 0;
-    for (i = 1; label[i] != '\0'; i++) {
-        if (!isalnum(label[i]) && label[i]!='_') return 0; /* Check if the name contains only alphanumeric characters */
-    }
-    return 1; /* Valid name */
-}
-
-int valid_instruction(char *instruction) {
-    int flag = 0;
-    int i=0;
-    if (strcmp(instruction,".data")==0 || strcmp(instruction,".string")==0 || strcmp(instruction,".entry")==0 || strcmp(instruction,".extern")==0) flag = 2;
-    for (i = 0; i < (int)(sizeof(operations) / sizeof(operations[0])); ++i) {
-        if (strcmp(instruction, operations[i]) == 0) {
-            flag = 1; /* Valid name */
-        }
-    }
-    return flag;
-}
-
 int print_labels_content(const char *filename, MacroTable *macro_table) {
     FILE *file;
     char line[2345];
     char *remainder;
     char *label = NULL;
     char *instruction = NULL;
+    int cnt;
+    int *dataArr;
     int lineNum = 0;
+    int i=0;
+    int ErrorFlag = 1;
     file = fopen(filename, "r");
     if (file == NULL) {
-        fprintf(stderr, "Error opening file: %s\n", filename);
+        fprintf(stderr, "File %s could not be opened\n", filename);
         return 0;
     }
 
@@ -77,6 +35,7 @@ int print_labels_content(const char *filename, MacroTable *macro_table) {
         /* Check if the line is truncated */
         if (strlen(line)>LINE_SIZE) {
             prer(lineNum, "Line is too long");
+            ErrorFlag = 0;
             continue;
         }
         /*Skip the line if it's a comment or an empty line; we already deleted all the trailing spaces*/
@@ -84,37 +43,136 @@ int print_labels_content(const char *filename, MacroTable *macro_table) {
 
         /* Process the line */
         remainder = get_line_remainder(line, &label, &instruction);
-        /*validate_line(line,label,instruction,remainder);*/
-        if (instruction) printf("%s %d\n", instruction,  valid_instruction(instruction));
+        if (!validate_line(line,label,instruction,remainder,lineNum,macro_table)) {
+            ErrorFlag = 0;
+            continue;
+        }
+
+        if (strcmp(instruction,".data")==0) {
+            dataArr = parse_numbers(remainder, &cnt);
+            if (dataArr==NULL) {
+                prer(lineNum, "Invalid input for .data instruction");
+                ErrorFlag = 0;
+                continue;
+            }
+
+        }
+
+
         free(remainder);
         free(label);
         free(instruction);
     }
+    printf("%d\n", ErrorFlag);
 
     fclose(file);
-    return 1;
+    return ErrorFlag;
 }
 
 
+
+
+int validate_line(char *line, char *label, char *instruction, char *remainder, int lineNum,MacroTable *macro_table) {
+    int i;
+
+    if (remainder==NULL) {
+        prer(lineNum, "Space after label name");
+        return 0;
+    }
+    if (!valid_label(label,macro_table)) {
+        prer(lineNum,"Label name is invalid");
+    }
+    if (!valid_instruction(instruction)) {
+        prer(lineNum,"Instruction name is invalid");
+        return 0;
+    }
+
+    /*printf("%s x %s x %s x\n",label, instruction, remainder);*/
+    return 1;
+}
+
+int valid_label(char *label, MacroTable *macro_table) {
+    int i;
+    if (label==NULL) return 1;/*No label*/
+    /* Check that it's not an operation name */
+    for (i = 0; i < NUM_OF_OPERATIONS; ++i) {
+        if (strcmp(label, operations[i]) == 0) {
+            return 0; /* Invalid name */
+        }
+    }
+
+    /* Check that it's not an instruction names */
+    for (i = 0; i < NUM_OF_INSTRUCTIONS; ++i) {
+        if (strcmp(label, instructions[i]) == 0) {
+            return 0; /* Invalid name */
+        }
+    }
+    for (i = 0; i < NUM_OF_REGISTERS; ++i) {
+        if (strcmp(label, registers[i]) == 0) {
+            return 0; /* Invalid name */
+        }
+    }
+
+    /*Check that it's not an a macro name*/
+    if (find_macro(macro_table, label) != NULL) return 0;
+    /*Label is too long*/
+    if (strlen(label)>LABEL_SIZE) return 0;
+    /*Check if the label is not according to the needed format*/
+    if (!isalpha(label[0])) return 0;
+    for (i = 1; label[i] != '\0'; i++) {
+        if (!isalnum(label[i]) && label[i]!='_') return 0; /* Check if the name contains only alphanumeric characters */
+    }
+    return 1; /* Valid name */
+}
+
+int valid_instruction(char *instruction) {
+    int value = 0;
+    int i;
+    for (i = 0; i < NUM_OF_INSTRUCTIONS; ++i) {
+        if (strcmp(instruction, instructions[i]) == 0) {
+            /*Assigning the correct value to the instruction*/
+            value = 1; /* Valid name */
+        }
+    }
+    for (i = 0; i < NUM_OF_OPERATIONS; ++i) {
+        if (strcmp(instruction, operations[i]) == 0) {
+            /*Index moved by constant (num of instructions)*/
+            value = 1;
+        }
+    }
+    return value;
+}
+
+
+
+
 char* process_label(const char *line, char **label) {
-    const char *colon_pos;
+    const char *col_pos;
     int label_length;
     char *remaining_line;
     int i, j;
 
-    colon_pos = strchr(line, ':');
+    col_pos = strchr(line, ':');
 
-    if (colon_pos == NULL) {
+    if (col_pos == NULL) {
         *label = NULL;
         remaining_line = (char *)malloc(strlen(line) + 1);
         if (remaining_line) {
             strcpy(remaining_line, line);
         }
-        return remaining_line; /* No colon found, return a copy of the whole line */
+        return remaining_line; /* No col found, return a copy of the whole line */
     }
 
     /* Calculate length of the potential label */
-    label_length = colon_pos - line;
+    label_length = col_pos - line;
+
+    /* Check for spaces before the col */
+    for (i = 0; i < label_length; i++) {
+        if (isspace(line[i])) {
+            *label = NULL;
+            return NULL; /* Invalid label due to space before the col */
+        }
+    }
 
     /* Allocate memory for the label, maximum possible length is label_length */
     *label = (char *)malloc(label_length + 1);
@@ -132,9 +190,9 @@ char* process_label(const char *line, char **label) {
     (*label)[j] = '\0';  /* Null-terminate the label */
 
     /* Allocate memory and copy the remaining part of the line */
-    remaining_line = (char *)malloc(strlen(colon_pos + 1) + 1); /* Skip the colon */
+    remaining_line = (char *)malloc(strlen(col_pos + 1) + 1); /* Skip the col */
     if (remaining_line) {
-        strcpy(remaining_line, colon_pos + 1);
+        strcpy(remaining_line, col_pos + 1);
     }
     return remaining_line;
 }
@@ -201,6 +259,7 @@ char* get_line_remainder(char *line, char **label, char **instruction) {
 
     /* process the label */
     char *line_after_label = process_label(line, label);
+    if (line_after_label==NULL) return NULL;
     free(line);
 
     /* process the instruction */
@@ -212,6 +271,8 @@ char* get_line_remainder(char *line, char **label, char **instruction) {
 
     return remainder;
 }
+
+
 
 
 

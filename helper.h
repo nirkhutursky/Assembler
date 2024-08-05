@@ -16,4 +16,6 @@ int is_instruction(const char *line);
 
 void prer(int lineNum, char* error_type);
 
+int* parse_numbers(const char *line, int *num_count);
+
 #endif /*HELPER_H*/

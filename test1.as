@@ -1,5 +1,5 @@
 MAIN: add r3, LIST
-Data : porn #48
+LOOP: prn #48
 macr m_macr
  cmp r3, #-6
  bne END
@@ -7,9 +7,13 @@ endmacr
  lea STR, r6
  inc r6
  mov *r6,K
-    subi r1, r4
+ sub r1, r4
  m_macr
  dec K
  jmp LOOP
-END: stop
-    STR:    .string    "abcd"
+r5: stop
+   ;STR: .string "abcd"
+DD : .string
+LIST: .data    6   ,        -9, +17
+ .data -100
+ stop
