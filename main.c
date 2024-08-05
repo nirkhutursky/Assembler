@@ -33,7 +33,7 @@ int main(int argc, char *argv[]) {
             fprintf(stderr, "Error processing file: %s\n", argv[i]);
             remove(output_filename);
         }
-        print_labels_content(output_filename);
+        print_labels_content(output_filename, mt);
         free_macro_table(mt);
         mt = create_macro_table();
     }

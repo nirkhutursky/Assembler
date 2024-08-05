@@ -11,14 +11,14 @@
  * and not an already defined macro, and only valid chars)*/
 int validate_macro(const char *name, MacroTable *macro_table) {
     int i;
-    /* Check that it's not an operation names */
+    /* Check that it's not an operation name */
     for (i = 0; i < (int)(sizeof(operations) / sizeof(operations[0])); ++i) {
         if (strcmp(name, operations[i]) == 0) {
             return 0; /* Invalid name */
         }
     }
 
-    /* Check that it's not an instruction names */
+    /* Check that it's not an instruction name */
     for (i = 0; i < (int)(sizeof(instructions) / sizeof(instructions[0])); ++i) {
         if (strcmp(name, instructions[i]) == 0) {
             return 0; /* Invalid name */

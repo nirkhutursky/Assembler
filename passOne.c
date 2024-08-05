@@ -19,7 +19,47 @@ int validate_line(char *line, char *label, char *instruction, char *remainder) {
     return 1;
 }
 
-int print_labels_content(const char *filename) {
+int valid_label(char *label, MacroTable *macro_table) {
+    int i;
+    /* Check that it's not an operation name */
+    for (i = 0; i < (int)(sizeof(operations) / sizeof(operations[0])); ++i) {
+        if (strcmp(label, operations[i]) == 0) {
+            return 0; /* Invalid name */
+        }
+    }
+
+    /* Check that it's not an instruction names */
+    for (i = 0; i < (int)(sizeof(instructions) / sizeof(instructions[0])); ++i) {
+        if (strcmp(label, instructions[i]) == 0) {
+            return 0; /* Invalid name */
+        }
+    }
+
+    /*Check that it's not an a macro name*/
+    if (find_macro(macro_table, label) != NULL) return 0;
+    /*Label is too long*/
+    if (strlen(label)>LABEL_SIZE) return 0;
+    /*The label is not according to the needed format*/
+    if (!isalpha(label[0])) return 0;
+    for (i = 1; label[i] != '\0'; i++) {
+        if (!isalnum(label[i]) && label[i]!='_') return 0; /* Check if the name contains only alphanumeric characters */
+    }
+    return 1; /* Valid name */
+}
+
+int valid_instruction(char *instruction) {
+    int flag = 0;
+    int i=0;
+    if (strcmp(instruction,".data")==0 || strcmp(instruction,".string")==0 || strcmp(instruction,".entry")==0 || strcmp(instruction,".extern")==0) flag = 2;
+    for (i = 0; i < (int)(sizeof(operations) / sizeof(operations[0])); ++i) {
+        if (strcmp(instruction, operations[i]) == 0) {
+            flag = 1; /* Valid name */
+        }
+    }
+    return flag;
+}
+
+int print_labels_content(const char *filename, MacroTable *macro_table) {
     FILE *file;
     char line[2345];
     char *remainder;
@@ -44,7 +84,8 @@ int print_labels_content(const char *filename) {
 
         /* Process the line */
         remainder = get_line_remainder(line, &label, &instruction);
-        validate_line(line,label,instruction,remainder);
+        /*validate_line(line,label,instruction,remainder);*/
+        if (instruction) printf("%s %d\n", instruction,  valid_instruction(instruction));
         free(remainder);
         free(label);
         free(instruction);
@@ -55,7 +96,7 @@ int print_labels_content(const char *filename) {
 }
 
 
-char* trim_label(const char *line, char **label) {
+char* process_label(const char *line, char **label) {
     const char *colon_pos;
     int label_length;
     char *remaining_line;
@@ -98,9 +139,9 @@ char* trim_label(const char *line, char **label) {
     return remaining_line;
 }
 /*
- * Function: trim_instruction
+ * Function: process_instruction
  * --------------------------
- * Trims the instruction from the given line and returns the remaining line.
+ * processs the instruction from the given line and returns the remaining line.
  *
  * Parameters:
  *  - line: The line to process.
@@ -109,7 +150,7 @@ char* trim_label(const char *line, char **label) {
  * Returns:
  *  - Pointer to the remaining part of the line after the instruction.
  */
-char* trim_instruction(const char *line, char **instruction) {
+char* process_instruction(const char *line, char **instruction) {
     const char *start = line;
     const char *end;
     char *remaining_line;
@@ -147,9 +188,9 @@ char* trim_instruction(const char *line, char **instruction) {
 }
 
 /* Function to get the remainder of the line after label and instruction */
-void trim_trailing_spaces(char *str) {
+void process_trailing_spaces(char *str) {
     char *end = str + strlen(str) - 1;
-    while (end > str && isspace((unsigned char)*end)) {
+    while (end > str && isspace(*end)) {
         end--;
     }
     *(end + 1) = '\0';
@@ -158,16 +199,16 @@ void trim_trailing_spaces(char *str) {
 char* get_line_remainder(char *line, char **label, char **instruction) {
     char *remainder = NULL;
 
-    /* Trim the label */
-    char *line_after_label = trim_label(line, label);
+    /* process the label */
+    char *line_after_label = process_label(line, label);
     free(line);
 
-    /* Trim the instruction */
-    remainder = trim_instruction(line_after_label, instruction);
+    /* process the instruction */
+    remainder = process_instruction(line_after_label, instruction);
     free(line_after_label);
 
-    /* Trim trailing spaces from the remainder */
-    trim_trailing_spaces(remainder);
+    /* process trailing spaces from the remainder */
+    process_trailing_spaces(remainder);
 
     return remainder;
 }
