@@ -13,17 +13,13 @@
 
 
 
-int print_labels_content(const char *filename, MacroTable *macro_table) {
+int print_content(const char *filename, MacroTable *macro_table, LabelTable *label_table) {
     FILE *file;
-    char line[2345];
-    char *remainder;
-    char *label = NULL;
-    char *instruction = NULL;
-    int cnt;
+    char line[2345], *remainder, *label = NULL, *instruction = NULL;
+
+    int cnt,lineNum = 0, i, IC = ADDRESS_START, ErrorFlag = 1;
     int *dataArr;
-    int lineNum = 0;
-    int i=0;
-    int ErrorFlag = 1;
+
     file = fopen(filename, "r");
     if (file == NULL) {
         fprintf(stderr, "File %s could not be opened\n", filename);
@@ -32,13 +28,13 @@ int print_labels_content(const char *filename, MacroTable *macro_table) {
 
     while (fgets(line, sizeof(line), file) != NULL) {
         lineNum++;
-        /* Check if the line is truncated */
+        /* Check if the line is too long */
         if (strlen(line)>LINE_SIZE) {
             prer(lineNum, "Line is too long");
             ErrorFlag = 0;
             continue;
         }
-        /*Skip the line if it's a comment or an empty line; we already deleted all the trailing spaces*/
+        /*Skip the line if it's a comment or an empty line; we already deleted all the starting spaces*/
         if (line[0]==';' || line[0]=='\n') continue;
 
         /* Process the line */
@@ -57,6 +53,11 @@ int print_labels_content(const char *filename, MacroTable *macro_table) {
             }
 
         }
+        if (label) {
+            printf("%s\n",label);
+            add_label(label_table, label, IC);
+        }
+
 
 
         free(remainder);
@@ -81,13 +82,14 @@ int validate_line(char *line, char *label, char *instruction, char *remainder, i
     }
     if (!valid_label(label,macro_table)) {
         prer(lineNum,"Label name is invalid");
+        return 0;
     }
     if (!valid_instruction(instruction)) {
         prer(lineNum,"Instruction name is invalid");
         return 0;
     }
 
-    /*printf("%s x %s x %s x\n",label, instruction, remainder);*/
+    /*printf("%s  %s  %s good line\n",label, instruction, remainder);*/
     return 1;
 }
 
@@ -273,7 +275,35 @@ char* get_line_remainder(char *line, char **label, char **instruction) {
 }
 
 
+LabelTable* create_label_table() {
+    LabelTable *table = (LabelTable *)malloc(sizeof(LabelTable));
+    /*Creating an empty table for the lables, with space for (start size) labels and it can be increased*/
+    table->label_list = (LabelNode *)malloc(START_SIZE * sizeof(LabelNode));
+    table->count = 0;
+    table->space = START_SIZE;
+    return table;
+}
 
 
+void add_label(LabelTable *table, const char *name, int address) {
+    /*We want to add label to the table but it's full, so we re allocating memory by increasing the space*/
+    if (table->count >= table->space) {
+        table->space += START_SIZE;
+        table->label_list = (LabelNode *)realloc(table->label_list, table->space * sizeof(LabelNode));
+    }
+    /*Adding the new label in the last place (the first one that is empty), by editing the attributes of the structs*/
+    strncpy(table->label_list[table->count].name, name, LABEL_SIZE);
+    table->label_list[table->count].name[LABEL_SIZE] = '\0';
+    table->label_list[table->count].address = address;
+    table->count++;
+}
 
+void free_label_table(LabelTable *table) {
+    if (table) {
+        free(table->label_list);
+        free(table);
+
+
+    }
+}
 

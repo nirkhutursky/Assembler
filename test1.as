@@ -11,9 +11,9 @@ endmacr
  m_macr
  dec K
  jmp LOOP
-r5: stop
+r55: stop
    ;STR: .string "abcd"
-DD : .string
+DD: .string
 LIST: .data    6   ,        -9, +17
  .data -100
  stop

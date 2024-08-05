@@ -1,5 +1,6 @@
 #ifndef STRUCTS_H
 #define STRUCTS_H
+#include "AssemblyConstants.h"
 
 
 typedef struct Line {
@@ -27,16 +28,15 @@ typedef struct MacroTable {
 
 
 
-typedef struct Label {
-    char *name;
+typedef struct {
+    char name[LABEL_SIZE + 1];
     int address;
-    int type;
-    struct Label *next;
-} Label;
+} LabelNode;
 
-typedef struct LabelTable {
-    Label *head;
-    Label *tail;
+typedef struct {
+    LabelNode *label_list;
+    int count;
+    int space;
 } LabelTable;
 
 #endif /* STRUCTS_H */

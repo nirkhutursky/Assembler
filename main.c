@@ -14,15 +14,15 @@
 
 
 int main(int argc, char *argv[]) {
-    int i;
-    MacroTable *mt;
-
+    int i,j;
+    MacroTable *mt = create_macro_table();
+    LabelTable *lt = create_label_table();
     if (argc < 2) {
         fprintf(stderr, "Usage: %s <input_files>\n", argv[0]);
         return 1;
     }
 
-    mt = create_macro_table();
+
 
     for (i = 1; i < argc; i++) {
         char output_filename[256];
@@ -33,9 +33,14 @@ int main(int argc, char *argv[]) {
             fprintf(stderr, "Error processing file: %s\n", argv[i]);
             remove(output_filename);
         }
-        print_labels_content(output_filename, mt);
+        print_content(output_filename, mt, lt);
+        for (j = 0; j < lt->count; j++) {
+            printf("Label: %s, Address: %d\n", lt->label_list[j].name, lt->label_list[j].address);
+        }
+        free_label_table(lt);
         free_macro_table(mt);
         mt = create_macro_table();
+        lt = create_label_table();
     }
 
     return 0;

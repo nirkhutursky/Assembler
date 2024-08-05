@@ -27,6 +27,10 @@
 #define MACRODEF 5
 /*the length of the end of macro definition, starting with "endmacr"*/
 #define MACEND 7
+/*The starting space for labels in the label table*/
+#define START_SIZE 8
+/*The starting adress of the instruction counter*/
+#define ADDRESS_START 100
 #define BIG_LEN 1234
 /* Constants for all possible label types */
 #define DATA 1
