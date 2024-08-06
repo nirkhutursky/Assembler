@@ -248,7 +248,7 @@ char* process_instruction(const char *line, char **instruction) {
 }
 
 /* Function to get the remainder of the line after label and instruction */
-void process_trailing_spaces(char *str) {
+void del_ending_spaces(char *str) {
     char *end = str + strlen(str) - 1;
     while (end > str && isspace(*end)) {
         end--;
@@ -269,7 +269,7 @@ char* get_line_remainder(char *line, char **label, char **instruction) {
     free(line_after_label);
 
     /* process trailing spaces from the remainder */
-    process_trailing_spaces(remainder);
+    del_ending_spaces(remainder);
 
     return remainder;
 }
@@ -278,7 +278,16 @@ char* get_line_remainder(char *line, char **label, char **instruction) {
 LabelTable* create_label_table() {
     LabelTable *table = (LabelTable *)malloc(sizeof(LabelTable));
     /*Creating an empty table for the lables, with space for (start size) labels and it can be increased*/
+    if (table == NULL) {
+        fprintf(stderr, "Memory allocation error\n");
+        exit(1);
+    }
     table->label_list = (LabelNode *)malloc(START_SIZE * sizeof(LabelNode));
+    if (table->label_list == NULL) {
+        fprintf(stderr, "Memory allocation error\n");
+        free(table);
+        exit(1);
+    }
     table->count = 0;
     table->space = START_SIZE;
     return table;
@@ -290,6 +299,10 @@ void add_label(LabelTable *table, const char *name, int address) {
     if (table->count >= table->space) {
         table->space += START_SIZE;
         table->label_list = (LabelNode *)realloc(table->label_list, table->space * sizeof(LabelNode));
+        if (table->label_list == NULL) {
+            fprintf(stderr, "Memory allocation error\n");
+            exit(1);
+        }
     }
     /*Adding the new label in the last place (the first one that is empty), by editing the attributes of the structs*/
     strncpy(table->label_list[table->count].name, name, LABEL_SIZE);
@@ -298,12 +311,15 @@ void add_label(LabelTable *table, const char *name, int address) {
     table->count++;
 }
 
-void free_label_table(LabelTable *table) {
-    if (table) {
-        free(table->label_list);
-        free(table);
-
-
+void free_label_table(LabelTable *label_table) {
+    if (label_table) {
+        if (label_table->label_list) {
+            free(label_table->label_list);
+            label_table->label_list = NULL;
+        }
+        label_table = NULL;
     }
 }
+
+
 

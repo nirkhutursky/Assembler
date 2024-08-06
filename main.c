@@ -37,11 +37,15 @@ int main(int argc, char *argv[]) {
         for (j = 0; j < lt->count; j++) {
             printf("Label: %s, Address: %d\n", lt->label_list[j].name, lt->label_list[j].address);
         }
-        free_label_table(lt);
+        lt->count = 0;
         free_macro_table(mt);
         mt = create_macro_table();
-        lt = create_label_table();
+
     }
+
+
+    free_label_table(lt);
+
 
     return 0;
 }
