@@ -32,6 +32,7 @@
 /*The starting adress of the instruction counter*/
 #define ADDRESS_START 100
 #define BIG_LEN 1234
+#define ERR -1
 /* Constants for all possible label types */
 #define DATA 1
 #define STRING 2

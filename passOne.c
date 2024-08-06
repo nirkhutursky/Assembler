@@ -15,10 +15,9 @@
 
 int print_content(const char *filename, MacroTable *macro_table, LabelTable *label_table) {
     FILE *file;
-    char line[2345], *remainder, *label = NULL, *instruction = NULL;
+    char line[2345], *remainder, *label = NULL, *instruction = NULL, *strArr;
 
-    int cnt,lineNum = 0, i, IC = ADDRESS_START, ErrorFlag = 1;
-    int *dataArr;
+    int cnt,lineNum = 0, i,DC = 0,  IC = ADDRESS_START, ErrorFlag = 1, add, *dataArr;
 
     file = fopen(filename, "r");
     if (file == NULL) {
@@ -28,35 +27,26 @@ int print_content(const char *filename, MacroTable *macro_table, LabelTable *lab
 
     while (fgets(line, sizeof(line), file) != NULL) {
         lineNum++;
-        /* Check if the line is too long */
-        if (strlen(line)>LINE_SIZE) {
-            prer(lineNum, "Line is too long");
-            ErrorFlag = 0;
-            continue;
-        }
         /*Skip the line if it's a comment or an empty line; we already deleted all the starting spaces*/
         if (line[0]==';' || line[0]=='\n') continue;
-
         /* Process the line */
         remainder = get_line_remainder(line, &label, &instruction);
-        if (!validate_line(line,label,instruction,remainder,lineNum,macro_table)) {
+        if (!validate_line(line,label,instruction,remainder,lineNum,macro_table,label_table,IC)) {
             ErrorFlag = 0;
             continue;
         }
 
-        if (strcmp(instruction,".data")==0) {
-            dataArr = parse_numbers(remainder, &cnt);
-            if (dataArr==NULL) {
-                prer(lineNum, "Invalid input for .data instruction");
+        if (instruction && instruction[0]=='.') {
+            add = count_special_instruction(instruction, remainder, lineNum);
+            if (add==ERR) {
                 ErrorFlag = 0;
                 continue;
             }
+            IC+=add;
+        }
 
-        }
-        if (label) {
-            printf("%s\n",label);
-            add_label(label_table, label, IC);
-        }
+
+
 
 
 
@@ -73,11 +63,15 @@ int print_content(const char *filename, MacroTable *macro_table, LabelTable *lab
 
 
 
-int validate_line(char *line, char *label, char *instruction, char *remainder, int lineNum,MacroTable *macro_table) {
+int validate_line(char *line, char *label, char *instruction, char *remainder, int lineNum,MacroTable *macro_table, LabelTable *label_table, int IC) {
     int i;
 
     if (remainder==NULL) {
         prer(lineNum, "Space after label name");
+        return 0;
+    }
+    if (strlen(line)>LINE_SIZE) {
+        prer(lineNum, "Line is too long");
         return 0;
     }
     if (!valid_label(label,macro_table)) {
@@ -88,8 +82,20 @@ int validate_line(char *line, char *label, char *instruction, char *remainder, i
         prer(lineNum,"Instruction name is invalid");
         return 0;
     }
+    if (label) {
+        /*Check whether the label was defined earlier*/
+        if (find_label(label_table,label)) add_label(label_table, label,instruction, IC);
+        else {
+            prer(lineNum, "Label can only be defined once");
+            return 0;
+        }
+    }
 
-    /*printf("%s  %s  %s good line\n",label, instruction, remainder);*/
+
+    /*
+    printf("%s  %s  %s good line\n",label, instruction, remainder);
+    */
+
     return 1;
 }
 
@@ -110,8 +116,10 @@ int valid_label(char *label, MacroTable *macro_table) {
         }
     }
     for (i = 0; i < NUM_OF_REGISTERS; ++i) {
+
         if (strcmp(label, registers[i]) == 0) {
             return 0; /* Invalid name */
+
         }
     }
 
@@ -279,12 +287,12 @@ LabelTable* create_label_table() {
     LabelTable *table = (LabelTable *)malloc(sizeof(LabelTable));
     /*Creating an empty table for the lables, with space for (start size) labels and it can be increased*/
     if (table == NULL) {
-        fprintf(stderr, "Memory allocation error\n");
+        fprintf(stderr, "Memory allocation failure\n");
         exit(1);
     }
     table->label_list = (LabelNode *)malloc(START_SIZE * sizeof(LabelNode));
     if (table->label_list == NULL) {
-        fprintf(stderr, "Memory allocation error\n");
+        fprintf(stderr, "Memory allocation failure\n");
         free(table);
         exit(1);
     }
@@ -294,24 +302,49 @@ LabelTable* create_label_table() {
 }
 
 
-void add_label(LabelTable *table, const char *name, int address) {
+void add_label(LabelTable *table, const char *name, char *instruction, int address) {
+    /*The type of label is either 1 if it's data, or 2 if it's standard instruction*/
+    int type;
+    if (strcmp(instruction, ".entry")==0 || strcmp(instruction, ".extern")==0) {
+        return;
+        /*In this case we ignore the label and don't add it to the label table*/
+    }
+    type = (strcmp(instruction, ".data")==0 || strcmp(instruction, ".string")==0) ? 1 : 2;
     /*We want to add label to the table but it's full, so we re allocating memory by increasing the space*/
     if (table->count >= table->space) {
         table->space += START_SIZE;
         table->label_list = (LabelNode *)realloc(table->label_list, table->space * sizeof(LabelNode));
         if (table->label_list == NULL) {
-            fprintf(stderr, "Memory allocation error\n");
+            fprintf(stderr, "Memory allocation failure\n");
             exit(1);
         }
     }
+
     /*Adding the new label in the last place (the first one that is empty), by editing the attributes of the structs*/
     strncpy(table->label_list[table->count].name, name, LABEL_SIZE);
     table->label_list[table->count].name[LABEL_SIZE] = '\0';
     table->label_list[table->count].address = address;
+    table->label_list[table->count].type = type;
     table->count++;
 }
 
+int find_label(const LabelTable *table, const char *name) {
+    int i;
+    /*Seacrhing for the label with the given name in the label table*/
+    for (i = 0; i < table->count; i++) {
+        /*
+        printf("%s\n", table->label_list[i].name);
+        */
+        if (strcmp(table->label_list[i].name, name) == 0) {
+            return 0;
+        }
+    }
+    return 1;
+}
+
+
 void free_label_table(LabelTable *label_table) {
+    /*If the table is in the memory, we free it*/
     if (label_table) {
         if (label_table->label_list) {
             free(label_table->label_list);

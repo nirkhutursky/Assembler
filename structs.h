@@ -31,6 +31,7 @@ typedef struct MacroTable {
 typedef struct {
     char name[LABEL_SIZE + 1];
     int address;
+    int type;
 } LabelNode;
 
 typedef struct {

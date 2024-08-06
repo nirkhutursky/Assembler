@@ -18,4 +18,7 @@ void prer(int lineNum, char* error_type);
 
 int* parse_numbers(const char *line, int *num_count);
 
+char* parse_word(const char *line);
+
+int count_special_instruction(char *instruction, char *remainder, int lineNum);
 #endif /*HELPER_H*/

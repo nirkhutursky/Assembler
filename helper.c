@@ -119,7 +119,60 @@ int* parse_numbers(const char *line, int *num_count) {
 }
 
 
-void instruction_tree(char* ins) {
+/* Function to parse a word from a string, the word is started and ended by a " (which should be ignored) */
+char* parse_word(const char *line) {
+    int len;
+    char *output;
+    len = strlen(line);
+    /*The string is too short or is NULL*/
+    if (line == NULL || len < 2) {
+        return NULL;
+    }
 
-    return;
+
+
+    /* Checking if the string starts and ends with quotes*/
+    if (line[0] != '"' || line[len - 1] != '"') {
+        return NULL;
+    }
+
+
+    output = (char*)malloc(len - 1);
+    if (output == NULL) {
+        fprintf(stderr, "Memory allocation error\n");
+        exit(1);
+    }
+    /* We delete the quotes so now the lenegth of the resulting string is shorter by 2 */
+    len--;
+    len--;
+
+
+    /*Copying the string into output besides the quotes*/
+    strncpy(output, line + 1, len);
+    output[len] = '\0';
+
+    return output;
+}
+
+
+int count_special_instruction(char *instruction, char *remainder, int lineNum) {
+    int cnt, *dataArr;
+    char *strArr;
+    if (strcmp(instruction,".data")==0) {
+        dataArr = parse_numbers(remainder, &cnt);
+        if (dataArr==NULL) {
+            prer(lineNum, "Invalid input for .data instruction");
+            return ERR;
+        }
+        return cnt;
+    }
+
+    if (strcmp(instruction,".string")==0) {
+        strArr = parse_word(remainder);
+        if (strArr==NULL) {
+            prer(lineNum, "Invalid input for .string instruction");
+        }
+        return strlen(strArr);
+    }
+    return 0;
 }

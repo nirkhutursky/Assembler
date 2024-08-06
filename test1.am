@@ -9,8 +9,8 @@ bne END
 dec K
 jmp LOOP
 r55: stop
-;STR: .string "abcd"
-DD: .string
+STR: .string "ab   c d 453 "
+DD: .string "ab c d"
 LIST: .data    6   ,        -9, +17
 .data -100
 stop

@@ -15,6 +15,7 @@
 
 int main(int argc, char *argv[]) {
     int i,j;
+
     MacroTable *mt = create_macro_table();
     LabelTable *lt = create_label_table();
     if (argc < 2) {
@@ -37,13 +38,14 @@ int main(int argc, char *argv[]) {
         for (j = 0; j < lt->count; j++) {
             printf("Label: %s, Address: %d\n", lt->label_list[j].name, lt->label_list[j].address);
         }
-        lt->count = 0;
         free_macro_table(mt);
         mt = create_macro_table();
+        free_label_table(lt);
+        lt = create_label_table();
 
     }
 
-
+    free_macro_table(mt);
     free_label_table(lt);
 
 
