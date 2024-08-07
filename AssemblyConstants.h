@@ -31,6 +31,8 @@
 #define START_SIZE 8
 /*The starting adress of the instruction counter*/
 #define ADDRESS_START 100
+/*A std line can have no more than 2 operands*/
+#define MAX_OPES 2
 #define BIG_LEN 1234
 #define ERR -1
 /* Constants for all possible label types */

@@ -6,7 +6,7 @@ macr m_macr
 endmacr
  lea STR, r6
  inc r6
- mov *r6,K
+ mov *r6,K,DD
  sub r1, r4
  m_macr
  dec K

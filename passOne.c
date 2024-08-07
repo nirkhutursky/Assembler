@@ -15,9 +15,10 @@
 
 int print_content(const char *filename, MacroTable *macro_table, LabelTable *label_table) {
     FILE *file;
-    char line[2345], *remainder, *label = NULL, *instruction = NULL, *strArr;
+    char line[2345], *remainder, *label = NULL, *instruction = NULL, *op1, *op2;
 
-    int cnt,lineNum = 0, i,DC = 0,  IC = ADDRESS_START, ErrorFlag = 1, add, *dataArr;
+
+    int cnt,lineNum = 0, i,DC = 0,  IC = ADDRESS_START, ErrorFlag = 1, add;
 
     file = fopen(filename, "r");
     if (file == NULL) {
@@ -40,10 +41,13 @@ int print_content(const char *filename, MacroTable *macro_table, LabelTable *lab
             add = count_special_instruction(instruction, remainder, lineNum);
             if (add==ERR) {
                 ErrorFlag = 0;
-                continue;
             }
             IC+=add;
+            continue;
         }
+        i = parse_operands(remainder,&op1,&op2,lineNum);
+        if (i!=ERR) printf("%d %s %s opes\n",i, op1, op2);
+        else ErrorFlag = 0;
 
 
 

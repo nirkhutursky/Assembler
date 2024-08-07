@@ -20,5 +20,11 @@ int* parse_numbers(const char *line, int *num_count);
 
 char* parse_word(const char *line);
 
+int parse_operands(const char *line, char **operand1, char **operand2, int lineNum);
 int count_special_instruction(char *instruction, char *remainder, int lineNum);
+
+int empty_s(const char *str);
+
+int count_commas(const char *str);
+
 #endif /*HELPER_H*/

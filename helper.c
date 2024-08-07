@@ -117,6 +117,88 @@ int* parse_numbers(const char *line, int *num_count) {
     *num_count = count;
     return numbers;
 }
+int empty_s(const char *str) {
+    while (*str) {
+        if (*str != ' ' && *str != '\t' && *str != '\n') {
+            return 0;  /*String is not empty*/
+        }
+        str++;
+    }
+    return 1;  /*Empty string*/
+}
+
+int count_commas(const char *str) {
+    int count = 0;
+
+    while (*str) {
+        if (*str == ',') {
+            count++;
+        }
+        str++;
+    }
+
+    return count;
+}
+
+int parse_operands(const char *line, char **operand1, char **operand2, int lineNum) {
+    const char *delimiter = ",";
+    char line_copy[LINE_SIZE];
+    char *oper;
+    /*Eventually we return the number of operands (that are non null)*/
+    int count = 0;
+    char *end;
+
+    if (count_commas(line)>=MAX_OPES) {
+        prer(lineNum, "Too many operands");
+        return ERR;
+    }
+
+    /*The operands are null be default, because we may have less than 2 operands*/
+    *operand1 = NULL;
+    *operand2 = NULL;
+    if (empty_s(line)) return 0;
+
+    strncpy(line_copy, line, LINE_SIZE - 1);
+    line_copy[LINE_SIZE - 1] = '\0';
+
+    /*Getting the value of the first operand*/
+    oper = strtok(line_copy, delimiter);
+    if (oper != NULL) {
+        /*Deleting not needed spaces*/
+        while (isspace(*oper)) oper++;
+        end = oper + strlen(oper) - 1;
+        while (end > oper && isspace(*end)) end--;
+        end[1] = '\0';
+        /*Allocating memory for the operand*/
+        *operand1 = (char *)malloc(strlen(oper) + 1);
+        if (*operand1 == NULL) {
+            fprintf(stderr, "Memory allocation failure\n");
+            exit(1);
+        }
+        strcpy(*operand1, oper);
+        count++;
+    }
+    /*Getting the value of the second operand*/
+    oper = strtok(NULL, delimiter);
+    if (oper != NULL) {
+        while (isspace(*oper)) oper++;
+        end = oper + strlen(oper) - 1;
+        while (end > oper && isspace(*end)) end--;
+        end[1] = '\0';
+
+        *operand2 = (char *)malloc(strlen(oper) + 1);
+        if (*operand2 == NULL) {
+            fprintf(stderr, "Memory allocation failure\n");
+            free(*operand1);
+            exit(1);
+        }
+        strcpy(*operand2, oper);
+        count++;
+    }
+
+    return count;
+}
+
 
 
 /* Function to parse a word from a string, the word is started and ended by a " (which should be ignored) */
@@ -158,12 +240,18 @@ char* parse_word(const char *line) {
 int count_special_instruction(char *instruction, char *remainder, int lineNum) {
     int cnt, *dataArr;
     char *strArr;
+    int i;
     if (strcmp(instruction,".data")==0) {
         dataArr = parse_numbers(remainder, &cnt);
+
         if (dataArr==NULL) {
             prer(lineNum, "Invalid input for .data instruction");
             return ERR;
         }
+        /*for (i = 0; i < cnt; i++) {
+            printf("%d ", dataArr[i]);
+        }
+        printf("\n");*/
         return cnt;
     }
 
@@ -172,7 +260,9 @@ int count_special_instruction(char *instruction, char *remainder, int lineNum) {
         if (strArr==NULL) {
             prer(lineNum, "Invalid input for .string instruction");
         }
+        printf("%s\n", strArr);
         return strlen(strArr);
     }
+    /*.extern and .entry don't add data and a label before them is ignored, therefore we add 0 to IC in this case*/
     return 0;
 }
