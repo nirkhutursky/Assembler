@@ -1,3 +1,4 @@
+
 #include <stdio.h>
 
 /*COMPILE
@@ -35,9 +36,9 @@ int main(int argc, char *argv[]) {
             remove(output_filename);
         }
         print_content(output_filename, mt, lt);
-        /*for (j = 0; j < lt->count; j++) {
+        for (j = 0; j < lt->count; j++) {
             printf("Label: %s, Address: %d Type: %d \n", lt->label_list[j].name, lt->label_list[j].address, lt->label_list[j].type);
-        }*/
+        }
         free_macro_table(mt);
         mt = create_macro_table();
         free_label_table(lt);

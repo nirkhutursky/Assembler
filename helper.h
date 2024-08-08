@@ -27,4 +27,7 @@ int empty_s(const char *str);
 
 int count_commas(const char *str);
 
+int get_operand_type(char *oper, int lineNum);
+
+int calc_IC(int type1, int type2);
 #endif /*HELPER_H*/

@@ -45,9 +45,12 @@ int print_content(const char *filename, MacroTable *macro_table, LabelTable *lab
             IC+=add;
             continue;
         }
-        i = parse_operands(remainder,&op1,&op2,lineNum);
-        if (i!=ERR) printf("%d %s %s opes\n",i, op1, op2);
-        else ErrorFlag = 0;
+        i = parse_operands(remainder,&op1,&op2,lineNum);/*
+        if (i!=ERR) printf("%d %s %s %d %d opes\n",i, op1, op2, get_operand_type(op1, lineNum), get_operand_type(op2, lineNum));
+        else ErrorFlag = 0;*/
+        if (i==ERR) ErrorFlag = 0;
+        IC+=calc_IC(get_operand_type(op1, lineNum), get_operand_type(op2, lineNum));
+
 
 
 
@@ -58,7 +61,6 @@ int print_content(const char *filename, MacroTable *macro_table, LabelTable *lab
         free(label);
         free(instruction);
     }
-    printf("%d\n", ErrorFlag);
 
     fclose(file);
     return ErrorFlag;
@@ -88,7 +90,7 @@ int validate_line(char *line, char *label, char *instruction, char *remainder, i
     }
     if (label) {
         /*Check whether the label was defined earlier*/
-        if (find_label(label_table,label)) add_label(label_table, label,instruction, IC);
+        if (!find_label(label_table,label)) add_label(label_table, label,instruction, IC);
         else {
             prer(lineNum, "Label can only be defined once");
             return 0;
@@ -311,7 +313,7 @@ void add_label(LabelTable *table, const char *name, char *instruction, int addre
     int type;
     if (strcmp(instruction, ".entry")==0 || strcmp(instruction, ".extern")==0) {
         return;
-        /*In this case we ignore the label and don't add it to the label table*/
+        /*In this case we ignore the label and don't add it to the label table as it doesn't require any binary code*/
     }
     type = (strcmp(instruction, ".data")==0 || strcmp(instruction, ".string")==0) ? 1 : 2;
     /*We want to add label to the table but it's full, so we re allocating memory by increasing the space*/
@@ -340,10 +342,10 @@ int find_label(const LabelTable *table, const char *name) {
         printf("%s\n", table->label_list[i].name);
         */
         if (strcmp(table->label_list[i].name, name) == 0) {
-            return 0;
+            return 1;
         }
     }
-    return 1;
+    return 0;
 }
 
 

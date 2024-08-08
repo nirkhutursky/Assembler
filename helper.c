@@ -260,9 +260,37 @@ int count_special_instruction(char *instruction, char *remainder, int lineNum) {
         if (strArr==NULL) {
             prer(lineNum, "Invalid input for .string instruction");
         }
-        printf("%s\n", strArr);
-        return strlen(strArr);
+        /*Including the end of line character*/
+        return strlen(strArr)+1;
     }
     /*.extern and .entry don't add data and a label before them is ignored, therefore we add 0 to IC in this case*/
     return 0;
+}
+
+
+int get_operand_type(char *oper, int lineNum) {
+    int i;
+    if (oper==NULL) return NONE;
+    if (oper[0]=='#') {
+        for (i=1; i<strlen(oper); i++) {
+            if (i==1 && oper[i]=='+' || oper[i]=='-') continue;
+            if (!isalnum(oper[i])) {
+                prer(lineNum, "Invalid immediate adressing, number is not defined");
+                return ERR;
+            }
+        }
+        return IMME;
+    }
+    if (strlen(oper)==DIR_REG_LEN && oper[0]=='r' && oper[1]<='8' && oper[1]>='1') return DIR_REG;
+    if (strlen(oper)==UNDIR_REG_LEN && oper[0]=='*' && oper[1]=='r' && oper[2]<='8' && oper[2]>='1') return UNDIR_REG;
+    return DIR;
+}
+
+int calc_IC(int type1, int type2) {
+    int add = 1;
+    if (type1==IMME || type1==DIR) add++;
+    if (type2==IMME || type2==DIR) add++;
+    if (type1==DIR_REG || type1==UNDIR_REG) add++;
+    else if (type2==DIR_REG || type2==UNDIR_REG) add++;
+    return add;
 }

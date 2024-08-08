@@ -4,7 +4,7 @@ inc r1
 jmp r3
 endmacr
 macr1
-add r3, r4 ljkgdf
+add r3, *r4
 fucker: .extern ss
 label1: .data 5, 10, -3,+233
 ;mov label1, r1

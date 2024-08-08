@@ -31,15 +31,20 @@
 #define START_SIZE 8
 /*The starting adress of the instruction counter*/
 #define ADDRESS_START 100
+/*The length of direct register adressing (*r1)*/
+#define DIR_REG_LEN 2
+/*The length of undirect register adressing (r1)*/
+#define UNDIR_REG_LEN 3
 /*A std line can have no more than 2 operands*/
 #define MAX_OPES 2
 #define BIG_LEN 1234
 #define ERR -1
 /* Constants for all possible label types */
-#define DATA 1
-#define STRING 2
-#define ENTRY 3
-#define EXTERN 4
+#define IMME 0
+#define DIR 1
+#define UNDIR_REG 2
+#define DIR_REG 3
+#define NONE 4
 
 /* The registers in our custom assembly language */
 static const char *registers[] = {
