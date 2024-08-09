@@ -6,6 +6,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "structs.h"
 #include "AssemblyConstants.h"
 
 
@@ -263,7 +264,7 @@ int count_special_instruction(char *instruction, char *remainder, int lineNum) {
         /*Including the end of line character*/
         return strlen(strArr)+1;
     }
-    /*.extern and .entry don't add data and a label before them is ignored, therefore we add 0 to IC in this case*/
+    /*.extern and .entry don't add to data counter and a label before them is ignored, therefore we add 0 to IC in this case*/
     return 0;
 }
 
@@ -293,4 +294,14 @@ int calc_IC(int type1, int type2) {
     if (type1==DIR_REG || type1==UNDIR_REG) add++;
     else if (type2==DIR_REG || type2==UNDIR_REG) add++;
     return add;
+}
+
+
+void DC_mem_calc(LabelTable *label_table, int IC) {
+    int i;
+    for (i = 0; i < label_table->count; i++) {
+        if (label_table->label_list[i].type == 1) {
+            label_table->label_list[i].address += IC;
+        }
+    }
 }

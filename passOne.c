@@ -32,7 +32,7 @@ int print_content(const char *filename, MacroTable *macro_table, LabelTable *lab
         if (line[0]==';' || line[0]=='\n') continue;
         /* Process the line */
         remainder = get_line_remainder(line, &label, &instruction);
-        if (!validate_line(line,label,instruction,remainder,lineNum,macro_table,label_table,IC)) {
+        if (!validate_line(line,label,instruction,remainder,lineNum,macro_table,label_table,IC,DC)) {
             ErrorFlag = 0;
             continue;
         }
@@ -42,7 +42,7 @@ int print_content(const char *filename, MacroTable *macro_table, LabelTable *lab
             if (add==ERR) {
                 ErrorFlag = 0;
             }
-            IC+=add;
+            DC+=add;
             continue;
         }
         i = parse_operands(remainder,&op1,&op2,lineNum);/*
@@ -62,6 +62,7 @@ int print_content(const char *filename, MacroTable *macro_table, LabelTable *lab
         free(instruction);
     }
 
+    DC_mem_calc(label_table, IC);
     fclose(file);
     return ErrorFlag;
 }
@@ -69,7 +70,7 @@ int print_content(const char *filename, MacroTable *macro_table, LabelTable *lab
 
 
 
-int validate_line(char *line, char *label, char *instruction, char *remainder, int lineNum,MacroTable *macro_table, LabelTable *label_table, int IC) {
+int validate_line(char *line, char *label, char *instruction, char *remainder, int lineNum,MacroTable *macro_table, LabelTable *label_table, int IC, int DC) {
     int i;
 
     if (remainder==NULL) {
@@ -90,7 +91,7 @@ int validate_line(char *line, char *label, char *instruction, char *remainder, i
     }
     if (label) {
         /*Check whether the label was defined earlier*/
-        if (!find_label(label_table,label)) add_label(label_table, label,instruction, IC);
+        if (!find_label(label_table,label)) add_label(label_table, label,instruction, IC, DC);
         else {
             prer(lineNum, "Label can only be defined once");
             return 0;
@@ -308,10 +309,11 @@ LabelTable* create_label_table() {
 }
 
 
-void add_label(LabelTable *table, const char *name, char *instruction, int address) {
+void add_label(LabelTable *table, const char *name, char *instruction, int address, int daddress) {
     /*The type of label is either 1 if it's data, or 2 if it's standard instruction*/
     int type;
     if (strcmp(instruction, ".entry")==0 || strcmp(instruction, ".extern")==0) {
+        
         return;
         /*In this case we ignore the label and don't add it to the label table as it doesn't require any binary code*/
     }
@@ -329,7 +331,11 @@ void add_label(LabelTable *table, const char *name, char *instruction, int addre
     /*Adding the new label in the last place (the first one that is empty), by editing the attributes of the structs*/
     strncpy(table->label_list[table->count].name, name, LABEL_SIZE);
     table->label_list[table->count].name[LABEL_SIZE] = '\0';
-    table->label_list[table->count].address = address;
+    /*Writing the adress as DC if it's of type data, otherwise it's IC*/
+    if (type==1) {
+        table->label_list[table->count].address = daddress;
+    }
+    else table->label_list[table->count].address = address;
     table->label_list[table->count].type = type;
     table->count++;
 }

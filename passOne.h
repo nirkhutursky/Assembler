@@ -10,7 +10,7 @@ int print_content(const char *filename, MacroTable *macro_table, LabelTable *lab
 char* trim_label(const char *line, char **label);
 char* trim_instruction(const char *line, char **instruction);
 char* get_line_remainder(char *line, char **label, char **instruction);
-int validate_line(char *line, char *label, char *instruction, char *remainder, int lineNum,MacroTable *macro_table, LabelTable *label_table, int IC);
+int validate_line(char *line, char *label, char *instruction, char *remainder, int lineNum,MacroTable *macro_table, LabelTable *label_table, int IC, int DC) ;
 void del_ending_spaces(char *str);
 int valid_label(char *label, MacroTable *macro_table);
 int valid_instruction(char *instruction);
@@ -18,8 +18,7 @@ int get_instruction(char *instruction);
 LabelTable* create_label_table();
 int find_label(const LabelTable *table, const char *name);
 /* Function to add a label to the label table */
-void add_label(LabelTable *table, const char *name, char *instruction, int address);
-
+void add_label(LabelTable *table, const char *name, char *instruction, int address, int daddress);
 /* Function to free the memory allocated for the label table */
 void free_label_table(LabelTable *table);
 

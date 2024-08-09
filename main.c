@@ -4,6 +4,13 @@
 /*COMPILE
   gcc -o ass MacroProcessing.c helper.c passOne.c main.c -std=c90 -Wall -Wextra -pedantic
   ./ass.exe testMacro test1
+
+  To Do:
+  extern and entry labels - process
+  find operand labels and check are they real in the end (GPT)
+  process all errors in the first pass?
+  for extern you can just add costum label
+  for entry make special struct
  */
 #include <stdlib.h>
 

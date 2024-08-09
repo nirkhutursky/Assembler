@@ -3,6 +3,8 @@
 #ifndef HELPER_H
 #define HELPER_H
 
+#include "structs.h"
+
 
 /*This functions adds .as ending to a given file
  * Gets the name of the input and output files
@@ -30,4 +32,6 @@ int count_commas(const char *str);
 int get_operand_type(char *oper, int lineNum);
 
 int calc_IC(int type1, int type2);
+
+void DC_mem_calc(LabelTable *label_table, int IC) ;
 #endif /*HELPER_H*/
