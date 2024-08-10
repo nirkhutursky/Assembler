@@ -34,4 +34,6 @@ int get_operand_type(char *oper, int lineNum);
 int calc_IC(int type1, int type2);
 
 void DC_mem_calc(LabelTable *label_table, int IC) ;
+
+int valid_oper_oper(int op1,int op2, char *operation, int lineNum, int op_count);
 #endif /*HELPER_H*/

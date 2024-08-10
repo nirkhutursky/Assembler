@@ -305,3 +305,162 @@ void DC_mem_calc(LabelTable *label_table, int IC) {
         }
     }
 }
+
+
+
+int valid_oper_oper(int op1,int op2, char *operation, int lineNum, int op_count){
+	if (strcmp(operation,"mov")==0){
+		if (op_count!=T_OP){
+	prer(lineNum, "Number of operands for mov is incorrect");
+	return 0;
+    }
+	if (op2==IMME){
+	prer(lineNum, "Addressing for mov operands is incorrect");
+	return 0;
+    }
+}
+if (strcmp(operation,"cmp")==0){
+	if (op_count!=T_OP){
+	prer(lineNum, "Number of operands for cmp is incorrect");
+	return 0;
+    }
+
+}
+if (strcmp(operation,"add")==0){
+	if (op_count!=T_OP){
+	prer(lineNum, "Number of operands for add is incorrect");
+	return 0;
+    }
+	if (op2==IMME){
+	prer(lineNum, "Addressing of add operands is incorrect");
+	return 0;
+    }
+}
+if (strcmp(operation,"sub")==0){
+if (op_count!=T_OP){
+	prer(lineNum, "Number of operands for sub is incorrect");
+	return 0;
+    }
+	if (op2==IMME){
+	prer(lineNum, "Addressing of sub operands is incorrect");
+	return 0;
+    }
+}
+if (strcmp(operation,"lea")==0){
+	if (op_count!=T_OP){
+	prer(lineNum, "Number of operands for lea is incorrect");
+	return 0;
+    }
+	if (op2==IMME){
+	prer(lineNum, "Addressing of lea operands is incorrect");
+	return 0;
+    }
+}
+if (strcmp(operation,"clr")==0){
+	if (op_count!=O_OP){
+	prer(lineNum, "Number of operands for clr is incorrect");
+	return 0;
+    }
+	if (op2!=NONE || op1==IMME || op1 == NONE){
+	prer(lineNum, "Addressing of clr operands is incorrect");
+	return 0;
+    }
+}
+
+if (strcmp(operation,"not")==0){
+	if (op_count!=O_OP){
+	prer(lineNum, "Number of operands for not is incorrect");
+	return 0;
+    }
+	if (op2!=NONE || op1==IMME || op1 == NONE){
+	prer(lineNum, "Addressing of not operands is incorrect");
+	return 0;
+    }
+}
+if (strcmp(operation,"inc")==0){
+	if (op_count!=O_OP){
+	prer(lineNum, "Number of operands for inc is incorrect");
+	return 0;
+    }
+	if (op2!=NONE || op1==IMME || op1 == NONE){
+	prer(lineNum, "Addressing of inc operands is incorrect");
+	return 0;
+    }
+}
+if (strcmp(operation,"dec")==0){
+	if (op_count!=O_OP){
+	prer(lineNum, "Number of operands for dec is incorrect");
+	return 0;
+    }
+	if (op2!=NONE || op1==IMME || op1 == NONE){
+	prer(lineNum, "Addressing of dec operands is incorrect");
+	return 0;
+    }
+}
+if (strcmp(operation,"jmp")==0){
+	if (op_count!=O_OP){
+	prer(lineNum, "Number of operands for jmp is incorrect");
+	return 0;
+    }
+	if (op2!=NONE || op1==IMME || op1==DIR_REG || op1 == NONE){
+	prer(lineNum, "Addressing of jmp operands is incorrect");
+	return 0;
+    }
+}
+if (strcmp(operation,"bne")==0){
+	if (op_count!=O_OP){
+	prer(lineNum, "Number of operands for bne is incorrect");
+	return 0;
+    }
+	if (op2!=NONE || op1==IMME || op1==DIR_REG || op1 == NONE){
+	prer(lineNum, "Addressing of bne operands is incorrect");
+	return 0;
+    }
+}
+if (strcmp(operation,"red")==0){
+	if (op_count!=O_OP){
+	prer(lineNum, "Number of operands for red is incorrect");
+	return 0;
+    }
+	if (op2!=NONE || op1==IMME || op1 == NONE){
+	prer(lineNum, "Addressing of red operands is incorrect");
+	return 0;
+    }
+}
+if (strcmp(operation,"prn")==0){
+	if (op_count!=O_OP){
+	prer(lineNum, "Number of operands for prn is incorrect");
+	return 0;
+    }
+	if (op2!=NONE || op1 == NONE){
+	prer(lineNum, "Addressing of prn operands is incorrect");
+	return 0;
+    }
+}
+
+
+if (strcmp(operation,"jsr")==0){
+	if (op_count!=O_OP){
+	prer(lineNum, "Number of operands for jsr is incorrect");
+	return 0;
+    }
+	if (op2!=NONE || op1==IMME || op1==DIR_REG || op1 == NONE){
+	prer(lineNum, "Addressing of jsr operands is incorrect");
+	return 0;
+    }
+}
+if (strcmp(operation,"rts")==0){
+	if (op_count!=Z_OP){
+	prer(lineNum, "Number of operands for rts is incorrect");
+	return 0;
+	}
+}
+if (strcmp(operation,"stop")==0){
+	if (op_count!=Z_OP){
+	prer(lineNum, "Number of operands for stop is incorrect");
+	return 0;
+    }
+}
+
+return 1;
+}

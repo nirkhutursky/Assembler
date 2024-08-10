@@ -39,6 +39,10 @@
 #define MAX_OPES 2
 #define BIG_LEN 1234
 #define ERR -1
+/*Constants to reprenst groups of operations based on number of operands*/
+#define Z_OP 0
+#define O_OP 1
+#define T_OP 2
 /* Constants for all possible label types */
 #define IMME 0
 #define DIR 1
@@ -46,6 +50,10 @@
 #define DIR_REG 3
 #define NONE 4
 
+#define DATA 1
+#define STRING 2
+#define ENTRY 3
+#define EXTERN 4
 /* The registers in our custom assembly language */
 static const char *registers[] = {
     "r0", "r1", "r2", "r3", "r4", "r5", "r6", "r7"
