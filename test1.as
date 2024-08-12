@@ -5,7 +5,8 @@ cmp r3, #-6
 bne END
 endmacr
 lea STR, r6
-inc r6
+inc r6,K
+.entry LIST
 STR: .string "abcd"
 mov *r6,K
 sub r1,r2

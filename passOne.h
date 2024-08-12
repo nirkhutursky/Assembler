@@ -6,9 +6,9 @@
 
 
 
-int print_content(const char *filename, MacroTable *macro_table, LabelTable *label_table);
-char* trim_label(const char *line, char **label);
-char* trim_instruction(const char *line, char **instruction);
+int pass_one(const char *filename, MacroTable *macro_table, LabelTable *label_table);
+/*char* trim_label(const char *line, char **label);
+char* trim_instruction(const char *line, char **instruction);*/
 char* get_line_remainder(char *line, char **label, char **instruction);
 int validate_line(char *line, char *label, char *instruction, char *remainder, int lineNum,MacroTable *macro_table, LabelTable *label_table, int IC, int DC) ;
 void del_ending_spaces(char *str);

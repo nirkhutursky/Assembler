@@ -2,21 +2,21 @@
 #include <stdio.h>
 
 /*COMPILE
-  gcc -o ass MacroProcessing.c helper.c passOne.c main.c -std=c90 -Wall -Wextra -pedantic
+  gcc -o ass MacroProcessing.c helper.c passOne.c passTwo.c main.c -std=c90 -Wall -Wextra -pedantic
   ./ass.exe testMacro test1
 
   To Do:
-  extern and entry labels - process
-  find operand labels and check are they real in the end (GPT)
-  process all errors in the first pass?
-  for extern you can just add costum label
-  for entry make special struct
+  entry labels - process - in the second pass check whether the entry label in the table
+  in the second pass -check that operand labels are correct (in DIR addressing) - also, if they are extern, push into ext.ob
+
  */
 #include <stdlib.h>
+#include <string.h>
 
 #include "MacroProcessing.h"
 #include "helper.h"
 #include "passOne.h"
+#include "passTwo.h"
 /*This project uses ansiC90*/
 
 
@@ -34,18 +34,21 @@ int main(int argc, char *argv[]) {
 
 
     for (i = 1; i < argc; i++) {
-        char output_filename[256];
-        get_out_name(argv[i], output_filename);
+        char output_filename[FNAME_SZ];
+        strcpy(output_filename, argv[i]);
+        strcat(argv[i], ".as");
+        strcat(output_filename, ".am");
         if (parse_macros(argv[i], output_filename, mt)) {
             printf("Processing %s -> %s\n", argv[i], output_filename);
         } else {
             fprintf(stderr, "Error processing file: %s\n", argv[i]);
             remove(output_filename);
         }
-        print_content(output_filename, mt, lt);
-        for (j = 0; j < lt->count; j++) {
+            pass_two(output_filename,lt,pass_one(output_filename, mt, lt));
+
+        /*for (j = 0; j < lt->count; j++) {
             printf("Label: %s, Address: %d Type: %d \n", lt->label_list[j].name, lt->label_list[j].address, lt->label_list[j].type);
-        }
+        }*/
         free_macro_table(mt);
         mt = create_macro_table();
         free_label_table(lt);

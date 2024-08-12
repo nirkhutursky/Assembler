@@ -14,5 +14,7 @@ add_executable(Assembler main.c
         helper.h
         helper.c
         passOne.c
-        passOne.h)
+        passOne.h
+        passTwo.c
+        passTwo.h)
 target_compile_options(Assembler PRIVATE -std=c90 -Wall -ansi -pedantic)

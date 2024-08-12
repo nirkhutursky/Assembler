@@ -13,9 +13,9 @@
 
 
 
-int print_content(const char *filename, MacroTable *macro_table, LabelTable *label_table) {
+int pass_one(const char *filename, MacroTable *macro_table, LabelTable *label_table) {
     FILE *file;
-    char line[2345], *remainder, *label = NULL, *instruction = NULL, *op1, *op2,type1,type2;
+    char line[LINE_SIZE], *remainder, *label = NULL, *instruction = NULL, *op1, *op2,type1,type2;
 
 
     int cnt,lineNum = 0, op_count,DC = 0,  IC = ADDRESS_START, ErrorFlag = 1, add;
@@ -25,7 +25,6 @@ int print_content(const char *filename, MacroTable *macro_table, LabelTable *lab
         fprintf(stderr, "File %s could not be opened\n", filename);
         return 0;
     }
-
     while (fgets(line, sizeof(line), file) != NULL) {
         lineNum++;
         /*Skip the line if it's a comment or an empty line; we already deleted all the starting spaces*/
@@ -49,13 +48,7 @@ int print_content(const char *filename, MacroTable *macro_table, LabelTable *lab
         op_count = parse_operands(remainder,&op1,&op2,lineNum);/*
         if (i!=ERR) printf("%d %s %s %d %d opes\n",i, op1, op2, get_operand_type(op1, lineNum), get_operand_type(op2, lineNum));
         else ErrorFlag = 0;*/
-        type1 = get_operand_type(op1, lineNum);
-        type2 = get_operand_type(op2, lineNum);
 
-        if (op_count==ERR || !valid_oper_oper(type1,type2,instruction,lineNum,op_count)) {
-            ErrorFlag = 0;
-            continue;
-        }
         IC+=calc_IC(type1,type2);
 
 
