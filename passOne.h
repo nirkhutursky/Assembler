@@ -17,6 +17,7 @@ int valid_instruction(char *instruction);
 int get_instruction(char *instruction);
 LabelTable* create_label_table();
 int find_label(const LabelTable *table, const char *name);
+int get_address(LabelTable *table, char *name);
 /* Function to add a label to the label table */
 void add_label(LabelTable *table, const char *name, char *instruction, int address, int daddress);
 /* Function to free the memory allocated for the label table */

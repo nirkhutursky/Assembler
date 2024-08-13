@@ -2,7 +2,7 @@
  * This file contains all the defined words in the given assembly language.
  * It includes the registers, operations, and instructions that are used in this assembly code
  * Seperted by type.
- * Additionally, it includes all the global variables that represent characteristics of the assembly language.
+ * Additionally, it includes all the variables that represent characteristics of the assembly language.
  */
 
 
@@ -52,18 +52,22 @@
 #define RANGE 2048
 #define DATA_RANGE 16384
 #define DATA 1
-#define STRING 2
-#define ENTRY 3
-#define EXTERN 4
+#define STD 2
+#define EXTERN 3
+#define ENTRY 4
 #define BASE 10
 #define ENDING 4
 #define FNAME_SZ 100
 #define OPCODE_BIT 11
-#define SRC_BIT 8
-#define DST_BIT 5
+#define SRC_BIT 7
+#define REG_SRC_BIT 6
+#define DST_BIT 3
+#define REG_DST_BIT 3
 #define A 2
 #define R 1
 #define E 0
+#define ADR_SP 3
+#define THRESH 4
 /* The registers in our custom assembly language */
 static const char *registers[] = {
     "r0", "r1", "r2", "r3", "r4", "r5", "r6", "r7"

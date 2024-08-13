@@ -5,7 +5,7 @@ jmp *r3
 endmacr
 macr1
 add r3, hara
-fucker: .extern ss
+fucker: .extern ss1
 label1: .data 5, 10, -3,+4035
 ;mov label1, r1
 macr haviv

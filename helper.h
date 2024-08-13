@@ -3,6 +3,8 @@
 #ifndef HELPER_H
 #define HELPER_H
 
+#include <string.h>
+
 #include "structs.h"
 
 
@@ -36,4 +38,7 @@ int calc_IC(int type1, int type2);
 void DC_mem_calc(LabelTable *label_table, int IC) ;
 
 int valid_oper_oper(int op1,int op2, char *operation, int lineNum, int op_count);
+
+signed int getNumber(char *op);
+
 #endif /*HELPER_H*/

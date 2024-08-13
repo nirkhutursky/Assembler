@@ -36,6 +36,7 @@ int pass_one(const char *filename, MacroTable *macro_table, LabelTable *label_ta
             continue;
         }
 
+
         if (instruction && instruction[0]=='.') {
             add = count_special_instruction(instruction, remainder, lineNum);
             if (add==ERR) {
@@ -45,10 +46,11 @@ int pass_one(const char *filename, MacroTable *macro_table, LabelTable *label_ta
             DC+=add;
             continue;
         }
-        op_count = parse_operands(remainder,&op1,&op2,lineNum);/*
-        if (i!=ERR) printf("%d %s %s %d %d opes\n",i, op1, op2, get_operand_type(op1, lineNum), get_operand_type(op2, lineNum));
-        else ErrorFlag = 0;*/
 
+        op_count = parse_operands(remainder,&op1,&op2,lineNum);
+        type1 = get_operand_type(op1, lineNum);
+        type2 = get_operand_type(op2, lineNum);
+        printf("%s %s %s\n",instruction, op1, op2);
         IC+=calc_IC(type1,type2);
 
 
@@ -90,6 +92,7 @@ int validate_line(char *line, char *label, char *instruction, char *remainder, i
         prer(lineNum,"Instruction name is invalid");
         return 0;
     }
+    if (strcmp(".extern", instruction)==0) label = remainder;
     if (label) {
         /*Check whether the label was defined earlier*/
         if (!find_label(label_table,label)) add_label(label_table, label,instruction, IC, DC);
@@ -311,32 +314,14 @@ LabelTable* create_label_table() {
 
 
 void add_label(LabelTable *table, const char *name, char *instruction, int address, int daddress) {
-    /*The type of label is either 1 if it's data, or 2 if it's standard instruction*/
     int type;
-    if (strcmp(instruction, ".extern")==0) {
-        if (table->count >= table->space) {
-            table->space += START_SIZE;
-            table->label_list = (LabelNode *)realloc(table->label_list, table->space * sizeof(LabelNode));
-            if (table->label_list == NULL) {
-                fprintf(stderr, "Memory allocation failure\n");
-                exit(1);
-            }
-        }
-        strncpy(table->label_list[table->count].name, name, LABEL_SIZE);
-        table->label_list[table->count].name[LABEL_SIZE] = '\0';
-        table->label_list[table->count].address = 0;
-        table->label_list[table->count].type = EXTERN;
-        table->count++;
-
-        return;
-        /*In this case we ignore the label and don't add it to the label table as it doesn't require any binary code*/
-    }
+    type = (strcmp(instruction, ".data")==0 || strcmp(instruction, ".string")==0) ? DATA : STD;
+    if (strcmp(instruction, ".extern")==0) type = EXTERN;
     if (strcmp(instruction, ".entry")==0) {
-
+        /*This will be processed in the second pass*/
         return;
     }
 
-    type = (strcmp(instruction, ".data")==0 || strcmp(instruction, ".string")==0) ? DATA : STRING;
     /*We want to add label to the table but it's full, so we re allocating memory by increasing the space*/
     if (table->count >= table->space) {
         table->space += START_SIZE;
@@ -351,10 +336,11 @@ void add_label(LabelTable *table, const char *name, char *instruction, int addre
     strncpy(table->label_list[table->count].name, name, LABEL_SIZE);
     table->label_list[table->count].name[LABEL_SIZE] = '\0';
     /*Writing the adress as DC if it's of type data, otherwise it's IC*/
-    if (type==1) {
+    if (type==DATA) {
         table->label_list[table->count].address = daddress;
     }
-    else table->label_list[table->count].address = address;
+    else if (type==STD) table->label_list[table->count].address = address;
+    else table->label_list[table->count].address = 0;
     table->label_list[table->count].type = type;
     table->count++;
 }
@@ -367,7 +353,21 @@ int find_label(const LabelTable *table, const char *name) {
         printf("%s\n", table->label_list[i].name);
         */
         if (strcmp(table->label_list[i].name, name) == 0) {
-            return 1;
+            return table->label_list[i].type;
+        }
+    }
+    return 0;
+}
+
+int get_address(LabelTable *table, char *name) {
+    int i;
+    /*Seacrhing for the label with the given name in the label table*/
+    for (i = 0; i < table->count; i++) {
+        /*
+        printf("%s\n", table->label_list[i].name);
+        */
+        if (strcmp(table->label_list[i].name, name) == 0) {
+            return table->label_list[i].address;
         }
     }
     return 0;

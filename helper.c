@@ -267,7 +267,7 @@ int count_special_instruction(char *instruction, char *remainder, int lineNum) {
         /*Including the end of line character*/
         return strlen(strArr)+1;
     }
-    /*.extern and .entry don't add to data counter and a label before them is ignored, therefore we add 0 to IC in this case*/
+    /*.extern and .entry don't add to data counter and a label before them is ignored, therefore we don't increase the IC in this case*/
     return 0;
 }
 
@@ -284,6 +284,7 @@ int get_operand_type(char *oper, int lineNum) {
             if (i==1 && oper[i]=='+' || oper[i]=='-') continue;
             if (!isalnum(oper[i])) {
                 prer(lineNum, "Invalid immediate adressing, number is not defined");
+                prer(lineNum, "Invalid immediate adressing, number is not defined");
                 return ERR;
             }
             num*=BASE;
@@ -295,8 +296,8 @@ int get_operand_type(char *oper, int lineNum) {
         }
         return IMME;
     }
-    if (strlen(oper)==DIR_REG_LEN && oper[0]=='r' && oper[1]<='8' && oper[1]>='1') return DIR_REG;
-    if (strlen(oper)==UNDIR_REG_LEN && oper[0]=='*' && oper[1]=='r' && oper[2]<='8' && oper[2]>='1') return UNDIR_REG;
+    if (strlen(oper)==DIR_REG_LEN && oper[0]=='r' && oper[1]<='7' && oper[1]>='0') return DIR_REG;
+    if (strlen(oper)==UNDIR_REG_LEN && oper[0]=='*' && oper[1]=='r' && oper[2]<='7' && oper[2]>='0') return UNDIR_REG;
     return DIR;
 }
 
@@ -500,4 +501,26 @@ if (strcmp(operation,"stop")==0){
     }
 prer(lineNum, "Operation is not defined");
 return 0;
+}
+
+
+signed int getNumber(char *op) {
+    /*First char is '#' so we ignore it */
+    signed int num, sign, i;
+    sign = 1;
+
+    op++;
+    if (op[0]=='-') {
+        sign = -1;
+        op++;
+    }
+    else if (op[0]=='+') op++;
+    num = 0;
+    for (i=0; i<strlen(op); i++) {
+        num*=10;
+        num+=(op[i]-'0');
+    }
+    /*Multyplying by -1 in case of - in the start*/
+    return num*sign;
+
 }
