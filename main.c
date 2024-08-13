@@ -8,7 +8,8 @@
   To Do:
   fill result files if there were no errors (and if entry and extern are present)
   clear warnings, comentate, change some variables (antigpt)
-  move to ubuntu (run dos2unix with gpt), make sure it works there
+  move to ubuntu (run dos2unix with gpt),create make file, make sure it works there
+  fix if needed memory leaks with valgrind with gpt
 
  */
 #include <stdlib.h>
