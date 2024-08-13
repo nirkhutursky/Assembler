@@ -6,7 +6,7 @@
 
 
 
-int pass_one(const char *filename, MacroTable *macro_table, LabelTable *label_table);
+int pass_one(const char *filename, MacroTable *macro_table, LabelTable *label_table, int *DC);
 /*char* trim_label(const char *line, char **label);
 char* trim_instruction(const char *line, char **instruction);*/
 char* get_line_remainder(char *line, char **label, char **instruction);

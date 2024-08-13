@@ -6,8 +6,9 @@
   ./ass.exe testMacro test1
 
   To Do:
-  entry labels - process - in the second pass check whether the entry label in the table
-  in the second pass -check that operand labels are correct (in DIR addressing) - also, if they are extern, push into ext.ob
+  fill result files if there were no errors (and if entry and extern are present)
+  clear warnings, comentate, change some variables (antigpt)
+  move to ubuntu (run dos2unix with gpt), make sure it works there
 
  */
 #include <stdlib.h>
@@ -22,7 +23,7 @@
 
 
 int main(int argc, char *argv[]) {
-    int i,j;
+    int i,j,DC,ErrorFlag;
 
     MacroTable *mt = create_macro_table();
     LabelTable *lt = create_label_table();
@@ -44,7 +45,12 @@ int main(int argc, char *argv[]) {
             fprintf(stderr, "Error processing file: %s\n", argv[i]);
             remove(output_filename);
         }
-            pass_two(output_filename,lt,pass_one(output_filename, mt, lt));
+            ErrorFlag = pass_one(output_filename, mt, lt, &DC);
+            pass_two(output_filename,lt,ErrorFlag,DC);
+            /*
+            printf("%d\n", DC);
+            */
+
 
         for (j = 0; j < lt->count; j++) {
             printf("Label: %s, Address: %d Type: %d \n", lt->label_list[j].name, lt->label_list[j].address, lt->label_list[j].type);

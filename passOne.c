@@ -13,13 +13,14 @@
 
 
 
-int pass_one(const char *filename, MacroTable *macro_table, LabelTable *label_table) {
+int pass_one(const char *filename, MacroTable *macro_table, LabelTable *label_table, int *DC) {
     FILE *file;
     char line[LINE_SIZE], *remainder, *label = NULL, *instruction = NULL, *op1, *op2,type1,type2;
 
 
-    int cnt,lineNum = 0, op_count,DC = 0,  IC = ADDRESS_START, ErrorFlag = 1, add;
+    int cnt,lineNum = 0, op_count,  IC = ADDRESS_START, ErrorFlag = 1, add;
 
+    *DC=0;
     file = fopen(filename, "r");
     if (file == NULL) {
         fprintf(stderr, "File %s could not be opened\n", filename);
@@ -31,7 +32,7 @@ int pass_one(const char *filename, MacroTable *macro_table, LabelTable *label_ta
         if (line[0]==';' || line[0]=='\n') continue;
         /* Process the line */
         remainder = get_line_remainder(line, &label, &instruction);
-        if (!validate_line(line,label,instruction,remainder,lineNum,macro_table,label_table,IC,DC)) {
+        if (!validate_line(line,label,instruction,remainder,lineNum,macro_table,label_table,IC,*DC)) {
             ErrorFlag = 0;
             continue;
         }
@@ -43,7 +44,7 @@ int pass_one(const char *filename, MacroTable *macro_table, LabelTable *label_ta
                 ErrorFlag = 0;
                 continue;
             }
-            DC+=add;
+            *DC+=add;
             continue;
         }
 
@@ -66,6 +67,8 @@ int pass_one(const char *filename, MacroTable *macro_table, LabelTable *label_ta
     }
 
     DC_mem_calc(label_table, IC);
+    /*Passing the final value of IC to DC, as the data and string will start from this index in the machine code*/
+    *DC = IC;
     fclose(file);
     return ErrorFlag;
 }
