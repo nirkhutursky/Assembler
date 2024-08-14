@@ -12,4 +12,4 @@ int get_opcode(char *op);
 int encbin(char *instruction, int type1, int type2);
 
 int encbinoper(char *op, int type, int where, LabelTable *label_table);
-#endif //PASSTWO_H
+#endif /*PASSTWO_H*/

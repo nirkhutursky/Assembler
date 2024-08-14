@@ -26,13 +26,13 @@ void prer(int lineNum, char* error_type) {
 
 
 
-int count_numbers(const char *line) {
+int count_numbers(char *line) {
     int count = 0;
     char *ind = line;
     int in_number = 0;
 
     while (*ind != '\0') {
-        if (isdigit(*ind) || (*ind == '+' || *ind == '-' && isdigit(*(ind + 1)))) {
+        if (isdigit(*ind) || ((*ind == '+' || *ind == '-') && isdigit(*(ind + 1)))) {
             if (!in_number) {
                 count++;
                 in_number = 1;
@@ -47,8 +47,8 @@ int count_numbers(const char *line) {
 }
 
 /* Function to validate and parse the input string into an array of integers */
-int* parse_numbers(const char *line, int *num_count) {
-    const char *ind = line;
+int* parse_numbers(char *line, int *num_count) {
+    char *ind = line;
     int number_started = 0;
     int comma_expected = 0;
     int count = count_numbers(line);
@@ -118,7 +118,7 @@ int* parse_numbers(const char *line, int *num_count) {
     *num_count = count;
     return numbers;
 }
-int empty_s(const char *str) {
+int empty_s(char *str) {
     while (*str) {
         if (*str != ' ' && *str != '\t' && *str != '\n') {
             return 0;  /*String is not empty*/
@@ -128,7 +128,7 @@ int empty_s(const char *str) {
     return 1;  /*Empty string*/
 }
 
-int count_commas(const char *str) {
+int count_commas(char *str) {
     int count = 0;
 
     while (*str) {
@@ -141,8 +141,8 @@ int count_commas(const char *str) {
     return count;
 }
 
-int parse_operands(const char *line, char **operand1, char **operand2, int lineNum) {
-    const char *delimiter = ",";
+int parse_operands(char *line, char **operand1, char **operand2) {
+    char *delimiter = ",";
     char line_copy[LINE_SIZE];
     char *oper;
     /*Eventually we return the number of operands (that are non null)*/
@@ -150,7 +150,6 @@ int parse_operands(const char *line, char **operand1, char **operand2, int lineN
     char *end;
 
     if (count_commas(line)>=MAX_OPES) {
-        prer(lineNum, "Too many operands");
         return ERR;
     }
 
@@ -203,7 +202,7 @@ int parse_operands(const char *line, char **operand1, char **operand2, int lineN
 
 
 /* Function to parse a word from a string, the word is started and ended by a " (which should be ignored) */
-char* parse_word(const char *line) {
+char* parse_word(char *line) {
     int len;
     char *output;
     len = strlen(line);
@@ -273,7 +272,9 @@ int count_special_instruction(char *instruction, char *remainder, int lineNum) {
 
 
 int get_operand_type(char *oper, int lineNum) {
-    int i, num=0;
+    size_t i;
+    int num=0;
+
     if (oper==NULL) return NONE;
     if (oper[0]=='#') {
         if (strlen(oper)>BASE) {
@@ -281,9 +282,8 @@ int get_operand_type(char *oper, int lineNum) {
             return ERR;
         }
         for (i=1; i<strlen(oper); i++) {
-            if (i==1 && oper[i]=='+' || oper[i]=='-') continue;
+            if (i==1 && (oper[i]=='+' || oper[i]=='-')) continue;
             if (!isalnum(oper[i])) {
-                prer(lineNum, "Invalid immediate adressing, number is not defined");
                 prer(lineNum, "Invalid immediate adressing, number is not defined");
                 return ERR;
             }
@@ -506,7 +506,8 @@ return 0;
 
 signed int getNumber(char *op) {
     /*First char is '#' so we ignore it */
-    signed int num, sign, i;
+    signed int num, sign ;
+    size_t i;
     sign = 1;
 
     op++;

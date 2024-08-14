@@ -14,22 +14,22 @@
  */
 void get_out_name( char *input_filename, char *output_filename);
 
-int is_label(const char *line, char **label) ;
+int is_label(char *line, char **label) ;
 
-int is_instruction(const char *line);
+int is_instruction(char *line);
 
 void prer(int lineNum, char* error_type);
 
-int* parse_numbers(const char *line, int *num_count);
+int* parse_numbers(char *line, int *num_count);
 
-char* parse_word(const char *line);
+char* parse_word(char *line);
 
-int parse_operands(const char *line, char **operand1, char **operand2, int lineNum);
+int parse_operands(char *line, char **operand1, char **operand2);
 int count_special_instruction(char *instruction, char *remainder, int lineNum);
 
-int empty_s(const char *str);
+int empty_s(char *str);
 
-int count_commas(const char *str);
+int count_commas(char *str);
 
 int get_operand_type(char *oper, int lineNum);
 

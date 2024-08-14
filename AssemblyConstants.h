@@ -51,12 +51,13 @@
 #define NONE 4
 #define RANGE 2048
 #define DATA_RANGE 16384
+#define CODESIZE 4096
 #define DATA 1
 #define STD 2
 #define EXTERN 3
 #define ENTRY 4
 #define BASE 10
-#define ENDING 4
+#define ENDING 3
 #define FNAME_SZ 100
 #define OPCODE_BIT 11
 #define SRC_BIT 7
@@ -68,19 +69,12 @@
 #define E 0
 #define ADR_SP 3
 #define THRESH 4
+#define FIVE_OCT_DIG 077777
 /* The registers in our custom assembly language */
-static const char *registers[] = {
-    "r0", "r1", "r2", "r3", "r4", "r5", "r6", "r7"
-};
-/* The operations in our custom assembly language  */
-static const char *operations[] = {
-    "mov", "cmp", "add", "sub", "lea", "clr", "not", "inc", "dec", "jmp", "bne", "red", "prn", "jsr", "rts", "stop"
-};
+extern char *registers[];
+extern char *operations[];
+extern char *instructions[];
 
-/* The instructions in our custom assembly language  */
-static const char *instructions[] = {
-    ".data", ".string", ".entry", ".extern"
-};
 
 
 

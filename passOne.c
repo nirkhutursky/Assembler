@@ -18,7 +18,7 @@ int pass_one(const char *filename, MacroTable *macro_table, LabelTable *label_ta
     char line[LINE_SIZE], *remainder, *label = NULL, *instruction = NULL, *op1, *op2,type1,type2;
 
 
-    int cnt,lineNum = 0, op_count,  IC = ADDRESS_START, ErrorFlag = 1, add;
+    int lineNum = 0, op_count,  IC = ADDRESS_START, ErrorFlag = 1, add;
 
     *DC=0;
     file = fopen(filename, "r");
@@ -48,10 +48,16 @@ int pass_one(const char *filename, MacroTable *macro_table, LabelTable *label_ta
             continue;
         }
 
-        op_count = parse_operands(remainder,&op1,&op2,lineNum);
+        op_count = parse_operands(remainder,&op1,&op2);
+        if (op_count==ERR) {
+            prer(lineNum, "Too many operands");
+            ErrorFlag = 0;
+        }
         type1 = get_operand_type(op1, lineNum);
         type2 = get_operand_type(op2, lineNum);
+        /*
         printf("%s %s %s\n",instruction, op1, op2);
+        */
         IC+=calc_IC(type1,type2);
 
 
@@ -77,7 +83,7 @@ int pass_one(const char *filename, MacroTable *macro_table, LabelTable *label_ta
 
 
 int validate_line(char *line, char *label, char *instruction, char *remainder, int lineNum,MacroTable *macro_table, LabelTable *label_table, int IC, int DC) {
-    int i;
+
 
     if (remainder==NULL) {
         prer(lineNum, "Space after label name");

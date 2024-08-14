@@ -2,7 +2,7 @@
 #include <stdio.h>
 
 /*COMPILE
-  gcc -o ass MacroProcessing.c helper.c passOne.c passTwo.c main.c -std=c90 -Wall -Wextra -pedantic
+  gcc -o ass AssemblyConstants.c MacroProcessing.c helper.c passOne.c passTwo.c main.c -std=c90 -Wall -Wextra -pedantic
   ./ass.exe testMacro test1
 
   To Do:
@@ -24,10 +24,13 @@
 
 
 int main(int argc, char *argv[]) {
-    int i,j,DC,ErrorFlag;
+    int i,DC,ErrorFlag;
+    MacroTable *mt;
+    LabelTable *lt;
 
-    MacroTable *mt = create_macro_table();
-    LabelTable *lt = create_label_table();
+
+    mt = create_macro_table();
+    lt = create_label_table();
     if (argc < 2) {
         fprintf(stderr, "Usage: %s <input_files>\n", argv[0]);
         return 1;
@@ -45,6 +48,7 @@ int main(int argc, char *argv[]) {
         } else {
             fprintf(stderr, "Error processing file: %s\n", argv[i]);
             remove(output_filename);
+            continue;
         }
             ErrorFlag = pass_one(output_filename, mt, lt, &DC);
             pass_two(output_filename,lt,ErrorFlag,DC);
@@ -53,9 +57,9 @@ int main(int argc, char *argv[]) {
             */
 
 
-        for (j = 0; j < lt->count; j++) {
+        /*for (j = 0; j < lt->count; j++) {
             printf("Label: %s, Address: %d Type: %d \n", lt->label_list[j].name, lt->label_list[j].address, lt->label_list[j].type);
-        }
+        }*/
         free_macro_table(mt);
         mt = create_macro_table();
         free_label_table(lt);
