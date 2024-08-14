@@ -53,7 +53,6 @@ void pass_two(char *filename, LabelTable *label_table, int ErrorFlag, int DC) {
             else {
                 /*Adding entry label to the file with its address*/
                 fprintf(fent,"%s %d\n",remainder, get_address(label_table,remainder));
-                fprintf(fent,"%s %d\n",remainder, get_address(label_table,remainder));
                 entFlag = 1;
             }
             continue;

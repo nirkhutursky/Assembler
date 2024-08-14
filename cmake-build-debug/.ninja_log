@@ -20,3 +20,10 @@
 5	128	7453506008520368	CMakeFiles/Assembler.dir/main.c.obj	653f81376ad72f4c
 15	149	7453506008622126	CMakeFiles/Assembler.dir/passTwo.c.obj	cc6eaccd735a88a1
 149	264	7453506009965989	Assembler.exe	708bad3386d7190d
+8	149	7453750874240215	CMakeFiles/Assembler.dir/main.c.obj	653f81376ad72f4c
+60	150	7453750874765034	CMakeFiles/Assembler.dir/AssemblyConstants.c.obj	faeb108ceb8260d5
+19	163	7453750874344976	CMakeFiles/Assembler.dir/MacroProcessing.c.obj	738425d8c5c8ee09
+29	171	7453750874448250	CMakeFiles/Assembler.dir/helper.c.obj	44cae1a2bd9f764c
+39	172	7453750874539514	CMakeFiles/Assembler.dir/passOne.c.obj	b84d6f1a031949bb
+48	176	7453750874645704	CMakeFiles/Assembler.dir/passTwo.c.obj	cc6eaccd735a88a1
+176	306	7453750875924062	Assembler.exe	708bad3386d7190d
