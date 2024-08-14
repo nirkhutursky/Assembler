@@ -1,5 +1,4 @@
 #include "MacroProcessing.h"
-
 #include <ctype.h>
 #include "structs.h"
 #include "AssemblyConstants.h"

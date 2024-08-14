@@ -2,7 +2,9 @@
 #define STRUCTS_H
 #include "AssemblyConstants.h"
 
-
+/*This file defines the structures neeeded in the project, mainly to save values of lines,macros and
+ * labels together with additional attributes
+ */
 typedef struct Line {
     char *value;
     int number;

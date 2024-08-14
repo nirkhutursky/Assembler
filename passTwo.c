@@ -3,11 +3,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <ctype.h>
-
 #include "AssemblyConstants.h"
 #include "helper.h"
-#include "MacroProcessing.h"
 #include "structs.h"
 
 void pass_two(char *filename, LabelTable *label_table, int ErrorFlag, int DC) {
@@ -49,10 +46,13 @@ void pass_two(char *filename, LabelTable *label_table, int ErrorFlag, int DC) {
         printf("%s %s %s \n",label,instruction,remainder);
         */
         if (strcmp(instruction, ".entry")==0) {
+            /*Checking entry labels, if valid we add them to the entry file, otherwise mark as error*/
             if(!sec_pass_valid_line(instruction, remainder, lineNum, label_table, op1, op2)) {
                 ErrorFlag = 0;
             }
             else {
+                /*Adding entry label to the file with its address*/
+                fprintf(fent,"%s %d\n",remainder, get_address(label_table,remainder));
                 fprintf(fent,"%s %d\n",remainder, get_address(label_table,remainder));
                 entFlag = 1;
             }
@@ -85,9 +85,10 @@ void pass_two(char *filename, LabelTable *label_table, int ErrorFlag, int DC) {
             }
             opercode1 = 0;
             opercode2 = 0;
-
+            /*Encoding the operation with the addressing types*/
             opbincode = encbin(instruction, type1, type2);
             if (IC>=CODESIZE) {
+                /*Address is out of machine code array bounds*/
                 prer(lineNum, "There is no more space for writing machine code");
                 ErrorFlag = 0;
                 break;
@@ -95,6 +96,7 @@ void pass_two(char *filename, LabelTable *label_table, int ErrorFlag, int DC) {
             /*If both source and dest exist*/
             if (type1!=NONE) {
                 /*First operand is source, second one is destination*/
+                /*Adding extern label to the file with its address*/
                 if (find_label(label_table, op1)==EXTERN) {
                     fprintf(fext,"%s %04d\n", op1, IC+O_OP);
                     extFlag = 1;
@@ -103,6 +105,7 @@ void pass_two(char *filename, LabelTable *label_table, int ErrorFlag, int DC) {
                     fprintf(fext,"%s %04d\n", op2, IC+T_OP);
                     extFlag = 1;
                 }
+                /*Encodings of both operands*/
                 opercode1 = encbinoper(op1, type1, 0, label_table);
                 opercode2 = encbinoper(op2, type2, 1, label_table);
                 /*If both operands are direct/undirect register addressing*/
@@ -112,15 +115,6 @@ void pass_two(char *filename, LabelTable *label_table, int ErrorFlag, int DC) {
                     IC++;
                     machineCode[IC] = opercode1;
                     IC++;
-
-                    /*for (i = 14; i >= 0; i--) {
-                        printf("%d", (opbincode >> i) & 1);
-                    }
-                    printf("\n");
-                    for (i = 14; i >= 0; i--) {
-                        printf("%d", (opercode1 >> i) & 1);
-                    }
-                    printf("\n");*/
                 }
                 else {
                     machineCode[IC] = opbincode;
@@ -129,24 +123,10 @@ void pass_two(char *filename, LabelTable *label_table, int ErrorFlag, int DC) {
                     IC++;
                     machineCode[IC] = opercode2;
                     IC++;
-                    /*for (i = 14; i >= 0; i--) {
-                        printf("%d", (opbincode >> i) & 1);
-                    }
-                    printf("\n");
-                    for (i = 14; i >= 0; i--) {
-                        printf("%d", (opercode1 >> i) & 1);
-                    }
-                    printf("\n");
-                    for (i = 14; i >= 0; i--) {
-                        printf("%d", (opercode2 >> i) & 1);
-                    }
-                    printf("\n");*/
                 }
-
-
-
             }
             else if (type2!=NONE) {
+                /*Adding extern label to the file with its address*/
                 if (find_label(label_table, op2)==EXTERN) {
                     fprintf(fext,"%s %04d\n", op2, IC+O_OP);
                     extFlag = 1;
@@ -157,31 +137,18 @@ void pass_two(char *filename, LabelTable *label_table, int ErrorFlag, int DC) {
                 IC++;
                 machineCode[IC] = opercode1;
                 IC++;
-                /*for (i = 14; i >= 0; i--) {
-                    printf("%d", (opbincode >> i) & 1);
-                }
-                printf("\n");
-                for (i = 14; i >= 0; i--) {
-                    printf("%d", (opercode1 >> i) & 1);
-                }
-                printf("\n");*/
             }
 
             else {
+                /*Zero operands*/
                 machineCode[IC] = opbincode;
                 IC++;
-                /*for (i = 14; i >= 0; i--) {
-                    printf("%d", (opbincode >> i) & 1);
-                }*/
-            }
 
-            /*
-            printf("%s %s %s %d %d %d\n",instruction,op1,op2, type1, type2, IC);
-            */
-            /*encode()*/
+            }
 
         }
         else {
+            /*Adding the array values into the code, in DC positions*/
             if (strcmp(instruction, ".data")==0) {
                 dataArr = parse_numbers(remainder, &cnt);
                 for (i=0; i<cnt; i++) {
@@ -190,6 +157,7 @@ void pass_two(char *filename, LabelTable *label_table, int ErrorFlag, int DC) {
                 DC+=cnt;
 
             }
+            /*Adding the ascii value of the chars in the string into the code, in DC positions*/
             if (strcmp(instruction, ".string")==0) {
                 strArr = parse_word(remainder);
                 len = strlen(strArr);
@@ -200,9 +168,6 @@ void pass_two(char *filename, LabelTable *label_table, int ErrorFlag, int DC) {
                 machineCode[DC] = '\0';
                 DC++;
             }
-            /*
-            printf("%s %s %d\n",instruction, remainder, DC);
-        */
         }
 
         free(remainder);
@@ -210,6 +175,7 @@ void pass_two(char *filename, LabelTable *label_table, int ErrorFlag, int DC) {
         free(instruction);
     }
     if (!ErrorFlag) {
+        /*There was an error either in the first or the second pass*/
         fclose(fenc);
         fclose(fext);
         fclose(fent);
@@ -221,14 +187,14 @@ void pass_two(char *filename, LabelTable *label_table, int ErrorFlag, int DC) {
     else {
         printf("Files were created successfully\n");
         /*Printing length of IC and length of DC*/
+
         fprintf(fenc,"  %d %d\n", IC-ADDRESS_START,DC-IC);
+        /*Printing into the file the coded words and their addresses*/
         for (i=ADDRESS_START; i<DC; i++) {
-            /*for (j = 14; j >= 0; j--) {
-                printf("%d", (machineCode[i] >> j) & 1);
-            }*/
             /*Using this mask and specifier ensures that we print exactly 5 digits (with zeroes if needed)*/
             fprintf(fenc,"%04d %05o\n",i, machineCode[i] & FIVE_OCT_DIG);
         }
+        /*Deleting the ext\ent files if there were no extern/entry labels*/
         if (!extFlag) {
             fclose(fext);
             remove(ext);
@@ -238,8 +204,6 @@ void pass_two(char *filename, LabelTable *label_table, int ErrorFlag, int DC) {
             remove(ent);
         }
     }
-
-
     fclose(file);
     fclose(fenc);
     fclose(fent);
@@ -250,6 +214,7 @@ void pass_two(char *filename, LabelTable *label_table, int ErrorFlag, int DC) {
 int sec_pass_valid_line(char *instruction, char *remainder, int lineNum, LabelTable *label_table, char *op1, char *op2) {
     int type_op1, type_op2, labelType;
     if (strcmp(instruction, ".entry")==0) {
+        /*Label that was declared with entry can't be defined in the current file, nor can it be extern*/
         labelType = find_label(label_table, remainder);
         if (!labelType) {
             prer(lineNum, "Entry parameter was not defined as label in this file");
@@ -264,6 +229,7 @@ int sec_pass_valid_line(char *instruction, char *remainder, int lineNum, LabelTa
 
     type_op1=get_operand_type(op1, lineNum);
     type_op2=get_operand_type(op2, lineNum);
+    /*Checking that all operands that are used as operands(direct addressing), are defined as labels somewhere in the file*/
     if (type_op1==DIR) {
         if (!find_label(label_table, op1)) {
             prer(lineNum, "Operand is adressed using direct adressing, but was not defined as label");
@@ -279,10 +245,11 @@ int sec_pass_valid_line(char *instruction, char *remainder, int lineNum, LabelTa
     return 1;
 
 }
-
+/*This function calculates the opcode of a given operation*/
 int get_opcode(char *op) {
     int i;
     for (i=0; i<NUM_OF_OPERATIONS;i++) {
+        /*The position of the operation in the table is its opcode*/
         if (strcmp(op,operations[i])==0) return i;
     }
     return ERR;
@@ -317,6 +284,7 @@ int encbinoper(char *op, int type, int where, LabelTable *label_table) {
         }
         op++;
         reg = op[0]-'0';
+        /*Shifting the bits according to src\dst and the resulting number*/
         if (where) num |= reg<<REG_DST_BIT;
         else num |= reg<<REG_SRC_BIT;
         num |= (1<<A);
@@ -330,6 +298,7 @@ int encbinoper(char *op, int type, int where, LabelTable *label_table) {
         return num;
     }
     if (type==DIR) {
+        /*Getting the address and the ARE bit, and shifting the bits accordingly*/
         num = get_address(label_table, op);
         are = find_label(label_table, op);
         if (are==EXTERN) num = (num<<ADR_SP)|(1<<E);

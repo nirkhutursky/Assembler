@@ -12,14 +12,11 @@
   fix if needed memory leaks with valgrind with gpt
 
  */
-#include <stdlib.h>
 #include <string.h>
-
 #include "MacroProcessing.h"
 #include "helper.h"
 #include "passOne.h"
 #include "passTwo.h"
-/*This project uses ansiC90*/
 
 
 
