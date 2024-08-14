@@ -1,6 +1,6 @@
 #include "AssemblyConstants.h"
 
-
+/*The definitions of the machine memory, including the registers, operations, and instructions*/
 char *registers[] = {
     "r0", "r1", "r2", "r3", "r4", "r5", "r6", "r7"
 };

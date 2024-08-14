@@ -3,6 +3,8 @@
  * It includes the registers, operations, and instructions that are used in this assembly code
  * Seperted by type.
  * Additionally, it includes all the variables that represent characteristics of the assembly language.
+ * The goal of the file is to avoid "Magic Numbers" in the code, make the code more clear and readable
+ * while also making it more moduler as it's enough to change one #define to change it in many places in the code.
  */
 
 
@@ -49,28 +51,35 @@
 #define UNDIR_REG 2
 #define DIR_REG 3
 #define NONE 4
+/*Ranged allowed for numbers*/
 #define RANGE 2048
 #define DATA_RANGE 16384
+/*Size of machine code in the machine*/
 #define CODESIZE 4096
+/*Types of Labels*/
 #define DATA 1
 #define STD 2
 #define EXTERN 3
 #define ENTRY 4
 #define BASE 10
+/*Constant sizes, ENDING means the ".am" ending which needs to be removed*/
 #define ENDING 3
 #define FNAME_SZ 100
+/*Bits positions for the final result*/
 #define OPCODE_BIT 11
 #define SRC_BIT 7
 #define REG_SRC_BIT 6
 #define DST_BIT 3
 #define REG_DST_BIT 3
+/*Type of addressing - Absolute, Relocatable or Extern*/
 #define A 2
 #define R 1
 #define E 0
+/*Numbers needed in the code*/
 #define ADR_SP 3
 #define THRESH 4
 #define FIVE_OCT_DIG 077777
-/* The registers in our custom assembly language */
+/* The arrays in our custom assembly language, defined extern to be accessible from different files in the project */
 extern char *registers[];
 extern char *operations[];
 extern char *instructions[];
