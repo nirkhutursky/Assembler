@@ -213,15 +213,13 @@ void expand_macros(MacroTable *macro_table, char *line, FILE *out) {
         }
     } else {
         /*Otherwise write the line as it is to the file*/
-        putLine(line, out);
+        fputs(line, out);
+        fputc('\n', out);
     }
 }
 
-/* Write an expanded line to the output file */
-void putLine(char *line, FILE *out) {
-    fputs(line, out);
-    fputc('\n', out); /* Adds a newline to each line */
-}
+
+
 
 
 /*This function is the main function, it parses the macros line by line

@@ -8,7 +8,7 @@
 #include "structs.h"
 
 void pass_two(char *filename, LabelTable *label_table, int ErrorFlag, int DC) {
-    char line[2345], *remainder, *label = NULL, *instruction = NULL, *op1, *op2,type1,type2, *strArr;
+    char line[BIG_LEN], *remainder, *label = NULL, *instruction = NULL, *op1, *op2,type1,type2, *strArr;
     int *dataArr,cnt,len,lineNum = 0, op_count,extFlag=0,entFlag = 0,  IC = ADDRESS_START,i,machineCode[CODESIZE];
     size_t j;
     signed int opbincode,opercode1, opercode2;
@@ -40,7 +40,7 @@ void pass_two(char *filename, LabelTable *label_table, int ErrorFlag, int DC) {
         /*
         Skip the line if it's a comment or an empty line
         */
-        if (line[0]==';' || line[0]=='\n') continue;
+        if (line[0]==';' || line[0]=='\n' || strlen(line)>LINE_SIZE) continue;
         remainder = get_line_remainder(line, &label, &instruction);
         /*
         printf("%s %s %s \n",label,instruction,remainder);
@@ -154,6 +154,7 @@ void pass_two(char *filename, LabelTable *label_table, int ErrorFlag, int DC) {
                     machineCode[DC+i] = dataArr[i];
                 }
                 DC+=cnt;
+                free(dataArr);
 
             }
             /*Adding the ascii value of the chars in the string into the code, in DC positions*/
@@ -166,6 +167,7 @@ void pass_two(char *filename, LabelTable *label_table, int ErrorFlag, int DC) {
                 DC+=len;
                 machineCode[DC] = '\0';
                 DC++;
+                free(strArr);
             }
         }
 

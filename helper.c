@@ -10,12 +10,6 @@
 #include "AssemblyConstants.h"
 
 
-/* This functions adds .as ending to a given file */
-void get_out_name( char *input_filename, char *output_filename) {
-    strcpy(output_filename, input_filename);
-    strcat(input_filename, ".as");
-    strcat(output_filename, ".am");
-}
 
 
 
@@ -24,13 +18,11 @@ void prer(int lineNum, char* error_type) {
 }
 
 
-
-
 int count_numbers(char *line) {
     int count = 0;
     char *ind = line;
     int in_number = 0;
-
+    /*We increase the counter each time that a new number begins*/
     while (*ind != '\0') {
         if (isdigit(*ind) || ((*ind == '+' || *ind == '-') && isdigit(*(ind + 1)))) {
             if (!in_number) {
@@ -49,13 +41,13 @@ int count_numbers(char *line) {
 /* Function to validate and parse the input string into an array of integers */
 int* parse_numbers(char *line, int *num_count) {
     char *ind = line;
-    int number_started = 0;
-    int comma_expected = 0;
+    int num_begin = 0;
+    int comma_need = 0;
     int count = count_numbers(line);
     int *numbers = (int *)malloc(count * sizeof(int));
     int index = 0;
-    char buffer[20]; /* Buffer to store each number as a string */
-    int buffer_index = 0;
+    char space[20]; /* space to store each number as a string */
+    int space_index = 0;
 
     if (numbers == NULL) {
         *num_count = 0;
@@ -68,33 +60,33 @@ int* parse_numbers(char *line, int *num_count) {
             ind++;
         } else if (*ind == '+' || *ind == '-') {
             /*Make sure that we don't have a sign in the middle of a number*/
-            if (number_started || comma_expected) {
+            if (num_begin || comma_need) {
                 free(numbers);
                 *num_count = 0;
                 return NULL;
             }
-            number_started = 1;
-            buffer[buffer_index++] = *ind;
+            num_begin = 1;
+            space[space_index++] = *ind;
             ind++;
         } else if (isdigit(*ind)) {
-            number_started = 1;
-            comma_expected = 1;
-            buffer[buffer_index++] = *ind;
+            num_begin = 1;
+            comma_need = 1;
+            space[space_index++] = *ind;
             ind++;
         } else if (*ind == ',') {
-            /*Commas may appear only after a number*/
-            if (!comma_expected) {
+            /*Commas can appear only after a number*/
+            if (!comma_need) {
                 free(numbers);
                 *num_count = 0;
                 return NULL;
             }
-            /*End the buffer and convert it to int*/
-            buffer[buffer_index] = '\0';
-            numbers[index++] = atoi(buffer);
-            buffer_index = 0;
+            /*End the space and convert the string number to int*/
+            space[space_index] = '\0';
+            numbers[index++] = atoi(space);
+            space_index = 0;
             /* Nullify the flags */
-            number_started = 0;
-            comma_expected = 0;
+            num_begin = 0;
+            comma_need = 0;
             ind++;
         } else {
             /*Invalid character*/
@@ -105,9 +97,9 @@ int* parse_numbers(char *line, int *num_count) {
     }
 
     /* Adding the last number to the list*/
-    if (number_started) {
-        buffer[buffer_index] = '\0';
-        numbers[index++] = atoi(buffer);
+    if (num_begin) {
+        space[space_index] = '\0';
+        numbers[index++] = atoi(space);
     } else {
         /*Last number is invalid*/
         free(numbers);
@@ -118,19 +110,10 @@ int* parse_numbers(char *line, int *num_count) {
     *num_count = count;
     return numbers;
 }
-int empty_s(char *str) {
-    while (*str) {
-        if (*str != ' ' && *str != '\t' && *str != '\n') {
-            return 0;  /*String is not empty*/
-        }
-        str++;
-    }
-    return 1;  /*Empty string*/
-}
 
 int count_commas(char *str) {
     int count = 0;
-
+    /*Increase counter for each comma*/
     while (*str) {
         if (*str == ',') {
             count++;
@@ -141,28 +124,39 @@ int count_commas(char *str) {
     return count;
 }
 
+int empty(char *str) {
+    while (*str) {
+        if (!isspace((unsigned char)*str)) {
+            return 0;  /*The string is not empty*/
+        }
+        str++;
+    }
+    return 1;  /*The string is empty*/
+}
+
 int parse_operands(char *line, char **operand1, char **operand2) {
-    char *delimiter = ",";
+    char *end;
     char line_copy[LINE_SIZE];
     char *oper;
     /*Eventually we return the number of operands (that are non null)*/
     int count = 0;
-    char *end;
+    char *comma = ",";
+
 
     if (count_commas(line)>=MAX_OPES) {
         return ERR;
     }
 
-    /*The operands are null be default, because we may have less than 2 operands*/
+    /*The operands are null by default, because we may have less than 2 operands*/
     *operand1 = NULL;
     *operand2 = NULL;
-    if (empty_s(line)) return 0;
+    if (empty(line)) return 0;
 
     strncpy(line_copy, line, LINE_SIZE - 1);
     line_copy[LINE_SIZE - 1] = '\0';
 
     /*Getting the value of the first operand*/
-    oper = strtok(line_copy, delimiter);
+    oper = strtok(line_copy, comma);
     if (oper != NULL) {
         /*Deleting not needed spaces*/
         while (isspace(*oper)) oper++;
@@ -179,7 +173,7 @@ int parse_operands(char *line, char **operand1, char **operand2) {
         count++;
     }
     /*Getting the value of the second operand*/
-    oper = strtok(NULL, delimiter);
+    oper = strtok(NULL, comma);
     if (oper != NULL) {
         while (isspace(*oper)) oper++;
         end = oper + strlen(oper) - 1;
@@ -241,20 +235,24 @@ int count_special_instruction(char *instruction, char *remainder, int lineNum) {
     int cnt, *dataArr;
     char *strArr;
     int i;
+    /*Wer return the ammount of memory the special instruction takes in the data image*/
     if (strcmp(instruction,".data")==0) {
         dataArr = parse_numbers(remainder, &cnt);
-
+        /*Validating that the array is valid*/
         if (dataArr==NULL) {
             prer(lineNum, "Invalid input for .data instruction");
+            free(dataArr);
             return ERR;
         }
         for (i = 0; i < cnt; i++) {
             /*Checking that the number is in the range*/
             if (dataArr[i]>DATA_RANGE || dataArr[i]<(-DATA_RANGE)) {
                 prer(lineNum, "Number not in the allowed range");
+                free(dataArr);
                 return ERR;
             }
         }
+        free(dataArr);
         return cnt;
     }
 
@@ -262,9 +260,13 @@ int count_special_instruction(char *instruction, char *remainder, int lineNum) {
         strArr = parse_word(remainder);
         if (strArr==NULL) {
             prer(lineNum, "Invalid input for .string instruction");
+            free(strArr);
+            return ERR;
         }
         /*Including the end of line character*/
-        return strlen(strArr)+1;
+        cnt = strlen(strArr)+1;
+        free(strArr);
+        return cnt;
     }
     /*.extern and .entry don't add to data counter and a label before them is ignored, therefore we don't increase the IC in this case*/
     return 0;
@@ -287,6 +289,7 @@ int get_operand_type(char *oper, int lineNum) {
                 prer(lineNum, "Invalid immediate adressing, number is not defined");
                 return ERR;
             }
+            /*Translating the number from string to int*/
             num*=BASE;
             num+=(oper[i]-'0');
         }
@@ -299,9 +302,11 @@ int get_operand_type(char *oper, int lineNum) {
     if (strlen(oper)==DIR_REG_LEN && oper[0]=='r' && oper[1]<='7' && oper[1]>='0') return DIR_REG;
     if (strlen(oper)==UNDIR_REG_LEN && oper[0]=='*' && oper[1]=='r' && oper[2]<='7' && oper[2]>='0') return UNDIR_REG;
     return DIR;
+    /*If all valid, we return the addressing type of the operand from 0 to 3*/
 }
 
 int calc_IC(int type1, int type2) {
+    /*Calculating the change to IC, based on the number of lines in the code I need to add according to the combination of addressing types*/
     int add = 1;
     if (type1==IMME || type1==DIR) add++;
     if (type2==IMME || type2==DIR) add++;
@@ -313,6 +318,7 @@ int calc_IC(int type1, int type2) {
 
 void DC_mem_calc(LabelTable *label_table, int IC) {
     int i;
+    /*going over the label table and adding IC to all labels that are of DATA type (.data and .string)*/
     for (i = 0; i < label_table->count; i++) {
         if (label_table->label_list[i].type == 1) {
             label_table->label_list[i].address += IC;
@@ -323,6 +329,7 @@ void DC_mem_calc(LabelTable *label_table, int IC) {
 
 
 int valid_oper_oper(int op1,int op2, char *operation, int lineNum, int op_count){
+    /*Validating for the given operation that the number of operands and their types fit the operation correctly*/
 	if (strcmp(operation,"mov")==0){
 		if (op_count!=T_OP){
 	        prer(lineNum, "Number of operands for mov is incorrect");
@@ -517,11 +524,13 @@ signed int getNumber(char *op) {
     }
     else if (op[0]=='+') op++;
     num = 0;
+    /*Translating number from string to int*/
     for (i=0; i<strlen(op); i++) {
         num*=10;
         num+=(op[i]-'0');
     }
     /*Multyplying by -1 in case of - in the start*/
     return num*sign;
+    /*Returning a signed int so it's saved in 2'c complement*/
 
 }

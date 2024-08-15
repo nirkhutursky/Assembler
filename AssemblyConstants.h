@@ -20,7 +20,7 @@
 /*Number of instructions*/
 #define NUM_OF_INSTRUCTIONS 4
 /*The maximal possible line size, including the '\n' character */
-#define LINE_SIZE 94
+#define LINE_SIZE 81
 /*The maximal possible label size */
 #define LABEL_SIZE 31
 /*The maximum number of macros allowed in one file */

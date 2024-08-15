@@ -84,10 +84,6 @@ void macro_data(MacroTable *macro_table, const char *macro_name, char *line, int
  */
 void expand_macros(MacroTable *macro_table, char *line, FILE *out);
 
-/*This function writes a line as it is to the output file, and adds a newline char
- * it gets the line to write, and the file the we write in
- */
-void putLine(char *line, FILE *out);
 
 /*This function is the main function, it parses the macros line by line
  * categorizing each line (either a macro definition, macro end, inside a macro or outside a macro
