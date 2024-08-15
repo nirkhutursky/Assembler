@@ -273,7 +273,7 @@ char* get_line_remainder(char *line, char **label, char **instruction) {
     /* process the label */
     char *line_after_label = process_label(line, label);
     if (line_after_label==NULL) return NULL;
-    free(line);
+
 
     /* process the instruction */
     remainder = process_instruction(line_after_label, instruction);

@@ -42,9 +42,6 @@ void pass_two(char *filename, LabelTable *label_table, int ErrorFlag, int DC) {
         */
         if (line[0]==';' || line[0]=='\n' || strlen(line)>LINE_SIZE) continue;
         remainder = get_line_remainder(line, &label, &instruction);
-        /*
-        printf("%s %s %s \n",label,instruction,remainder);
-        */
         if (strcmp(instruction, ".entry")==0) {
             /*Checking entry labels, if valid we add them to the entry file, otherwise mark as error*/
             if(!sec_pass_valid_line(instruction, remainder, lineNum, label_table, op1, op2)) {
@@ -177,9 +174,6 @@ void pass_two(char *filename, LabelTable *label_table, int ErrorFlag, int DC) {
     }
     if (!ErrorFlag) {
         /*There was an error either in the first or the second pass*/
-        fclose(fenc);
-        fclose(fext);
-        fclose(fent);
         remove(enc);
         remove(ent);
         remove(ext);
@@ -197,11 +191,9 @@ void pass_two(char *filename, LabelTable *label_table, int ErrorFlag, int DC) {
         }
         /*Deleting the ext\ent files if there were no extern/entry labels*/
         if (!extFlag) {
-            fclose(fext);
             remove(ext);
         }
         if (!entFlag) {
-            fclose(fent);
             remove(ent);
         }
     }

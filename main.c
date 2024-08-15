@@ -32,14 +32,21 @@ int main(int argc, char *argv[]) {
 
 
     for (i = 1; i < argc; i++) {
+        char input_filename[FNAME_SZ];
         char output_filename[FNAME_SZ];
+
+        strcpy(input_filename, argv[i]);
+        strcat(input_filename, ".as");
+
         strcpy(output_filename, argv[i]);
-        strcat(argv[i], ".as");
         strcat(output_filename, ".am");
-        if (parse_macros(argv[i], output_filename, mt)) {
-            printf("Parsing macros in %s to the file %s\n", argv[i], output_filename);
+
+        printf("%s\n", input_filename);
+
+        if (parse_macros(input_filename, output_filename, mt)) {
+            printf("Parsing macros in %s to the file %s\n", input_filename, output_filename);
         } else {
-            fprintf(stderr, "Error in parsing the file: %s\n", argv[i]);
+            fprintf(stderr, "Error in parsing the file: %s\n", input_filename);
             remove(output_filename);
             continue;
         }

@@ -16,7 +16,6 @@ LOOP: prn #48
 .entry MAIN
  jmp LOOP
 END: stop
-
 STR: .string "abcd"
 LIST: .data 6,   -9
  .data -100
