@@ -25,13 +25,14 @@ int main(int argc, char *argv[]) {
     LabelTable *lt;
 
     /*Initializing the label table and the macro table*/
-    mt = create_macro_table();
-    lt = create_label_table();
+
 
 
 
 
     for (i = 1; i < argc; i++) {
+        mt = create_macro_table();
+        lt = create_label_table();
         char input_filename[FNAME_SZ];
         char output_filename[FNAME_SZ];
 
@@ -47,7 +48,8 @@ int main(int argc, char *argv[]) {
             printf("Parsing macros in %s to the file %s\n", input_filename, output_filename);
         } else {
             fprintf(stderr, "Error in parsing the file: %s\n", input_filename);
-            remove(output_filename);
+            free_macro_table(mt);
+            free_label_table(lt);
             continue;
         }
         /*The returned value tells whether there was an error in the first pass*/
@@ -56,9 +58,7 @@ int main(int argc, char *argv[]) {
         pass_two(output_filename,lt,ErrorFlag,DC);
         /*Freeing the memomry allocated to the macro and label tables*/
         free_macro_table(mt);
-        mt = create_macro_table();
         free_label_table(lt);
-        lt = create_label_table();
 
     }
 

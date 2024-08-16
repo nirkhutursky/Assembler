@@ -35,17 +35,22 @@ int pass_one(char *filename, MacroTable *macro_table, LabelTable *label_table, i
         remainder = get_line_remainder(line, &label, &instruction);
         if (!validate_line(line,label,instruction,remainder,lineNum,macro_table,label_table,IC,*DC)) {
             ErrorFlag = 0;
+            free(remainder);
+            free(label);
+            free(instruction);
             continue;
         }
 
         /*This is a special instruction, process*/
         if (instruction && instruction[0]=='.') {
             add = count_special_instruction(instruction, remainder, lineNum);
+            free(remainder);
+            free(label);
+            free(instruction);
             if (add==ERR) {
                 ErrorFlag = 0;
-                continue;
             }
-            *DC+=add;
+            else *DC+=add;
             continue;
         }
         /*Validating the number of operands for the current operation*/
@@ -53,6 +58,9 @@ int pass_one(char *filename, MacroTable *macro_table, LabelTable *label_table, i
         if (op_count==ERR) {
             prer(lineNum, "Too many operands");
             ErrorFlag = 0;
+            free(remainder);
+            free(label);
+            free(instruction);
             continue;
         }
         /*Calculating the change to IC according to the operand types*/

@@ -52,24 +52,43 @@ void pass_two(char *filename, LabelTable *label_table, int ErrorFlag, int DC) {
                 fprintf(fent,"%s %d\n",remainder, get_address(label_table,remainder));
                 entFlag = 1;
             }
+            free(remainder);
+            free(label);
+            free(instruction);
             continue;
         }
-        if (strcmp(instruction, ".extern")==0) continue;
+        if (strcmp(instruction, ".extern")==0) {
+            free(remainder);
+            free(label);
+            free(instruction);
+            continue;
+        }
         /*data, string and extern and entry were processed already*/
         if (instruction[0]!='.'){
             /*Validating and processing the operations*/
             op_count = parse_operands(remainder,&op1,&op2);
-            if (op_count==ERR) continue;
+            if (op_count==ERR) {
+                free(remainder);
+                free(label);
+                free(instruction);
+                continue;
+            }
             type1 = get_operand_type(op1, lineNum);
             type2 = get_operand_type(op2, lineNum);
 
             if (op_count==ERR || !valid_oper_oper(type1,type2,instruction,lineNum,op_count)) {
                 ErrorFlag = 0;
+                free(remainder);
+                free(label);
+                free(instruction);
                 continue;
             }
             /*Checks that operands that are used aas labels were defined in the file*/
             if(!sec_pass_valid_line(instruction, remainder, lineNum, label_table, op1, op2)) {
                 ErrorFlag = 0;
+                free(remainder);
+                free(label);
+                free(instruction);
                 continue;
             }
             /*If there is only one operand, it's the destination operand*/
