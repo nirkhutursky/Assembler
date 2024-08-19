@@ -1,16 +1,7 @@
 
 #include <stdio.h>
 
-/*COMPILE
-  gcc -o ass AssemblyConstants.c MacroProcessing.c helper.c passOne.c passTwo.c main.c -std=c90 -Wall -Wextra -pedantic
-  ./ass.exe testMacro test1
 
-  To Do:
-  clear warnings, comentate, change some variables (antigpt)
-  move to ubuntu (run dos2unix with gpt),create make file, make sure it works there
-  fix if needed memory leaks with valgrind with gpt
-
- */
 #include <string.h>
 #include "MacroProcessing.h"
 #include "helper.h"
