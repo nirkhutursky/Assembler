@@ -1,76 +1,51 @@
-
 # Assembler
 
-## 🛠 Overview
-This project is an assembler written in C for a custom computer architecture. It translates assembly code into machine code, handling macros, labels, and various addressing modes. The assembler processes input files, parses macros, and generates binary code, following a two-pass method.
+Assembler is a C90 implementation of a two-pass assembler for a custom instruction set. It expands macros, resolves labels and symbols, validates addressing modes, and emits machine-code output for assembly source files.
 
-## ✨ Features
-- **Macro Processing**: Supports macro definitions and usage within the assembly code.
-- **Two-Pass Assembly**: 
-  - **Pass One**: Builds a symbol table and handles labels.
-  - **Pass Two**: Translates instructions and generates machine code.
-- **Error Handling**: Detects and reports syntax errors and memory allocation issues.
-- **Memory Management**: Properly allocates and frees memory to avoid leaks, as verified using Valgrind.
-- **Support for Custom Architecture**: Implements a specific instruction set and addressing modes, including immediate, direct, indirect register, and direct register addressing.
+## Features
 
-## 🚀 Installation
-To build and run the assembler, you need a GCC compiler and Make utility installed on your system.
+- Macro preprocessing before assembly.
+- Two-pass compilation flow for symbol resolution and code generation.
+- Support for labels and multiple addressing modes.
+- Error reporting for invalid input and allocation failures.
+- Manual memory management suitable for validation with tools such as Valgrind.
 
-### Clone the repository
+## Project Structure
+
+- `main.c`: program entry point and top-level assembly flow.
+- `MacroProcessing.c`: macro parsing and expansion.
+- `passOne.c`: first-pass symbol collection and validation.
+- `passTwo.c`: second-pass translation and output generation.
+- `helper.c`: shared utility helpers.
+- `AssemblyConstants.c`: instruction-set and assembler constants.
+- `structs.h`: shared data structures.
+- `test1.as`: sample assembly input.
+
+## Requirements
+
+- CMake 3.28 or newer.
+- A C compiler with C90 support.
+
+## Build
+
 ```bash
-git clone https://github.com/nirkhutursky/Assembler.git
+git clone https://github.com/NirKhutorsky/Assembler.git
 cd Assembler
+cmake -S . -B build
+cmake --build build
 ```
 
-### Build the project
+## Usage
+
+The program expects one or more input names without the `.as` suffix.
+
 ```bash
-make
+./build/Assembler test1
 ```
 
-### Run the assembler
-```bash
-./assembler <input_file>
-```
+Given `test1`, the assembler reads `test1.as`, expands macros into `test1.am`, and then runs the two assembly passes on the expanded file.
 
-## 💻 Usage
-Provide the assembler with an assembly file as input. The assembler will generate corresponding machine code output files.
+## Notes
 
-Example:
-```bash
-./assembler test1
-```
-
-## 📂 File Structure
-- **`main.c`**: Main function to handle the input and manage the assembly process.
-- **`MacroProcessing.c`**: Handles macro definitions and usage.
-- **`passOne.c`**: First pass of the assembler, building the symbol table and processing labels.
-- **`passTwo.c`**: Second pass of the assembler, translating instructions into machine code.
-- **`helper.c`**: Utility functions used across the assembler.
-- **`AssemblyConstants.c`**: Contains constants used in the assembly process.
-
-## 🧪 Testing and Debugging
-- **Valgrind**: Memory management and leak detection were verified using Valgrind. The assembler has been tested to ensure no memory leaks.
-
-## 🤝 Contributing
-If you want to contribute to this project, feel free to submit issues or pull requests.
-
-## 📜 License
-This project is licensed under the MIT License.
-
-## 📧 Contact
-For any questions or suggestions, feel free to reach out.
-
----
-
-### Example File Structure:
-```bash
-Assembler/
-├── main.c
-├── MacroProcessing.c
-├── passOne.c
-├── passTwo.c
-├── helper.c
-├── AssemblyConstants.c
-├── Makefile
-└── README.md
-```
+- The repository currently includes generated or local-development artifacts such as `ass.exe`, `cmake-build-debug`, and `.idea`.
+- The documented build path above uses the checked-in `CMakeLists.txt`, which matches the current repository contents.
